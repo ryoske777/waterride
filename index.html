@@ -1318,12 +1318,12 @@ function showPromptModal(title, placeholder, cb){
   const inp=document.getElementById('modal-input');
   inp.style.display='block'; inp.value=''; inp.placeholder=placeholder;
   const bc=document.getElementById('modal-btns'); bc.innerHTML='';
-  const confirm=()=>{ closeModal(); cb(inp.value.trim()||placeholder); };
-  const cancel=()=>{ closeModal(); cb(null); };
-  [{label:'확인',cls:'primary',cb:confirm},{label:'취소',cls:'secondary',cb:cancel}].forEach(b=>{
+  let done=false;
+  function finish(name){ if(done)return; done=true; inp.removeEventListener('keydown',onKey); closeModal(); cb(name); }
+  function onKey(e){ if(e.key==='Enter')finish(inp.value.trim()||placeholder); else if(e.key==='Escape')finish(null); }
+  [{label:'확인',cls:'primary',cb:()=>finish(inp.value.trim()||placeholder)},{label:'취소',cls:'secondary',cb:()=>finish(null)}].forEach(b=>{
     const el=document.createElement('button');el.className='modal-btn '+b.cls;el.textContent=b.label;el.addEventListener('click',b.cb);bc.appendChild(el);
   });
-  function onKey(e){ if(e.key==='Enter'){inp.removeEventListener('keydown',onKey);confirm();}else if(e.key==='Escape'){inp.removeEventListener('keydown',onKey);cancel();} }
   inp.addEventListener('keydown',onKey);
   document.getElementById('modal').classList.add('show');
   setTimeout(()=>inp.focus(),80);
