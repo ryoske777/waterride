@@ -14,27 +14,17 @@
     @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
     :root {
-      --bg: #0a0a0f;
-      --bg2: #111118;
-      --bg3: #1a1a24;
-      --border: #2a2a38;
-      --accent: #00e5a0;
-      --accent2: #ff4d6d;
-      --accent3: #ffd166;
-      --accent-usd: #60a5fa;
-      --text: #e8e8f0;
-      --text2: #9098b8;   /* label color — brighter than before */
-      --text3: #5a607e;
+      --bg: #0a0a0f; --bg2: #111118; --bg3: #1a1a24; --border: #2a2a38;
+      --accent: #00e5a0; --accent2: #ff4d6d; --accent3: #ffd166; --accent-usd: #60a5fa;
+      --text: #e8e8f0; --text2: #9098b8; --text3: #5a607e;
       --card: #13131c;
-      --safe: env(safe-area-inset-top);
-      --safeb: env(safe-area-inset-bottom);
+      --pos: #ff4d6d;   /* 수익/상승: 빨간 */
+      --neg: #60a5fa;   /* 손실/하락: 파란 */
+      --safe: env(safe-area-inset-top); --safeb: env(safe-area-inset-bottom);
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       font-family: 'Noto Sans KR', sans-serif;
       min-height: 100dvh;
       padding-top: max(var(--safe), 16px);
@@ -42,307 +32,243 @@
       overflow-x: hidden;
     }
 
-    /* ── Header ─────────────────────────────────── */
-    .header {
-      padding: 18px 20px 0;
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 16px;
-    }
+    /* ── Header ── */
+    .header { padding: 18px 20px 0; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
     .header-left { display: flex; align-items: flex-end; gap: 11px; }
     .header-icon {
       width: 38px; height: 38px;
       background: linear-gradient(135deg, var(--accent) 0%, #00b8d4 100%);
-      border-radius: 11px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; flex-shrink: 0; transition: background 0.4s;
+      border-radius: 11px; display: flex; align-items: center; justify-content: center;
+      font-size: 19px; flex-shrink: 0; transition: background 0.4s;
     }
     body.usd .header-icon { background: linear-gradient(135deg, var(--accent-usd) 0%, #818cf8 100%); }
-    .header-text h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
-    .header-text p { font-size: 11px; color: var(--text3); margin-top: 1px; font-family: 'Space Mono', monospace; }
+    .header-text h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    .header-text p { font-size: 13px; color: var(--text3); margin-top: 1px; font-family: 'Space Mono', monospace; }
 
-    /* Currency toggle */
-    .currency-toggle {
-      display: flex; background: var(--bg3);
-      border: 1px solid var(--border); border-radius: 11px;
-      padding: 3px; gap: 2px; flex-shrink: 0;
-    }
-    .cur-btn {
-      padding: 6px 12px; border: none; border-radius: 8px;
-      font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
-      cursor: pointer; transition: all 0.22s;
-      background: transparent; color: var(--text3); letter-spacing: 0.3px;
-    }
+    .currency-toggle { display: flex; background: var(--bg3); border: 1px solid var(--border); border-radius: 11px; padding: 3px; gap: 2px; flex-shrink: 0; }
+    .cur-btn { padding: 6px 12px; border: none; border-radius: 8px; font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.22s; background: transparent; color: var(--text3); }
     .cur-btn.active { background: var(--accent); color: #000; box-shadow: 0 2px 8px rgba(0,229,160,0.3); }
     body.usd .cur-btn.active { background: var(--accent-usd); box-shadow: 0 2px 8px rgba(96,165,250,0.35); }
 
-    /* ── Tab Bar ─────────────────────────────────── */
-    .tab-bar-wrap {
-      margin: 0 16px 16px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .tab-scroll {
-      flex: 1; display: flex; align-items: center; gap: 6px;
-      overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
-      padding-bottom: 2px;
-    }
+    /* ── Tab Bar ── */
+    .tab-bar-wrap { margin: 0 16px 16px; display: flex; align-items: center; gap: 8px; }
+    .tab-scroll { flex: 1; display: flex; align-items: center; gap: 6px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
     .tab-scroll::-webkit-scrollbar { display: none; }
-    .tab-btn {
-      flex-shrink: 0;
-      padding: 7px 13px;
-      background: var(--bg3); border: 1px solid var(--border);
-      border-radius: 10px;
-      font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
-      color: var(--text3); cursor: pointer;
-      transition: all 0.18s; white-space: nowrap;
-    }
-    .tab-btn.active {
-      background: var(--bg2); border-color: var(--accent);
-      color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(0,229,160,0.12);
-    }
+    .tab-btn { flex-shrink: 0; padding: 7px 13px; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; color: var(--text3); cursor: pointer; transition: all 0.18s; white-space: nowrap; }
+    .tab-btn.active { background: var(--bg2); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 0 2px rgba(0,229,160,0.12); }
     body.usd .tab-btn.active { border-color: var(--accent-usd); color: var(--accent-usd); box-shadow: 0 0 0 2px rgba(96,165,250,0.12); }
-
-    .tab-add-btn {
-      flex-shrink: 0; width: 34px; height: 34px;
-      background: var(--bg3); border: 1px dashed var(--border);
-      border-radius: 10px; color: var(--text3); font-size: 18px;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: all 0.18s;
-    }
+    .tab-add-btn { flex-shrink: 0; width: 34px; height: 34px; background: var(--bg3); border: 1px dashed var(--border); border-radius: 10px; color: var(--text3); font-size: 19px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.18s; }
     .tab-add-btn:active { border-color: var(--accent); color: var(--accent); }
-
-    .tab-del-btn {
-      flex-shrink: 0; width: 34px; height: 34px;
-      background: rgba(255,77,109,0.07); border: 1px solid rgba(255,77,109,0.18);
-      border-radius: 10px; color: var(--accent2); font-size: 15px;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: all 0.18s;
-    }
+    .tab-del-btn { flex-shrink: 0; width: 34px; height: 34px; background: rgba(255,77,109,0.07); border: 1px solid rgba(255,77,109,0.18); border-radius: 10px; color: var(--accent2); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.18s; }
     .tab-del-btn:active { background: rgba(255,77,109,0.18); }
 
-    /* ── Sections ─────────────────────────────────── */
-    .section {
-      margin: 0 16px 14px;
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 18px; overflow: hidden;
-    }
-    .section-header {
-      padding: 12px 18px;
-      display: flex; align-items: center; gap: 9px;
-      border-bottom: 1px solid var(--border); background: var(--bg2);
-    }
-    .section-badge {
-      font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700;
-      padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px;
-    }
+    /* ── Sections ── */
+    .section { margin: 0 16px 14px; background: var(--card); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+    .section-header { padding: 12px 18px; display: flex; align-items: center; gap: 9px; border-bottom: 1px solid var(--border); background: var(--bg2); }
+    .section-badge { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px; }
     .badge-hold { background: rgba(0,229,160,0.12); color: var(--accent); }
     .badge-buy  { background: rgba(255,209,102,0.12); color: var(--accent3); }
+    .badge-sim  { background: rgba(129,140,248,0.15); color: #a78bfa; }
     .badge-res  { background: rgba(0,229,160,0.08); color: var(--accent); }
     body.usd .badge-hold, body.usd .badge-res { background: rgba(96,165,250,0.12); color: var(--accent-usd); }
-    .section-title { font-size: 12px; font-weight: 500; color: var(--text2); }
+    .section-title { font-size: 14px; font-weight: 500; color: var(--text2); }
 
-    /* ── Input fields ─────────────────────────────── */
+    /* ── Fields ── */
     .fields { padding: 14px 18px; display: flex; flex-direction: column; gap: 11px; }
     .field-row { display: flex; gap: 10px; }
     .field { flex: 1; display: flex; flex-direction: column; gap: 5px; }
-
-    /* ▶ Label — brighter */
-    .field label {
-      font-size: 11px; color: var(--text2); letter-spacing: 0.2px;
-      font-family: 'Space Mono', monospace;
-    }
-    .opt-tag { font-size: 10px; color: var(--text3); }
-
+    .field label { font-size: 13px; color: var(--text2); letter-spacing: 0.2px; font-family: 'Space Mono', monospace; }
+    .opt-tag { font-size: 11px; color: var(--text3); }
     .input-wrap { position: relative; display: flex; align-items: center; }
-    .input-wrap input {
-      width: 100%; background: var(--bg3); border: 1px solid var(--border);
-      border-radius: 11px; padding: 11px 38px 11px 13px;
-      font-family: 'Space Mono', monospace; font-size: 14px; color: var(--text);
-      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
-      -webkit-appearance: none;
-    }
-    .input-wrap input::placeholder { color: var(--text3); font-size: 12px; }
+    .input-wrap input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 11px; padding: 11px 38px 11px 13px; font-family: 'Space Mono', monospace; font-size: 16px; color: var(--text); outline: none; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; }
+    .input-wrap input::placeholder { color: var(--text3); font-size: 14px; }
     .input-wrap input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,229,160,0.08); }
     body.usd .input-wrap input:focus { border-color: var(--accent-usd); box-shadow: 0 0 0 3px rgba(96,165,250,0.08); }
-    .input-wrap .unit {
-      position: absolute; right: 11px;
-      font-size: 10px; color: var(--text3);
-      font-family: 'Space Mono', monospace; pointer-events: none;
-    }
+    .input-wrap .unit { position: absolute; right: 11px; font-size: 11px; color: var(--text3); font-family: 'Space Mono', monospace; pointer-events: none; }
 
-    /* Add row */
     .add-btn-wrap { padding: 0 18px 14px; }
-    .add-btn {
-      width: 100%; background: transparent;
-      border: 1px dashed var(--border); border-radius: 11px;
-      padding: 9px; color: var(--text3); font-size: 12px;
-      font-family: 'Noto Sans KR', sans-serif;
-      cursor: pointer; transition: all 0.2s;
-      display: flex; align-items: center; justify-content: center; gap: 5px;
-    }
+    .add-btn { width: 100%; background: transparent; border: 1px dashed var(--border); border-radius: 11px; padding: 9px; color: var(--text3); font-size: 14px; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; }
     .add-btn:active { border-color: var(--accent3); color: var(--accent3); }
-
     .extra-row { padding: 0 18px 11px; display: flex; gap: 10px; align-items: flex-end; }
     .extra-row .field { flex: 1; }
-    .del-btn {
-      width: 38px; height: 40px;
-      background: rgba(255,77,109,0.08); border: 1px solid rgba(255,77,109,0.2);
-      border-radius: 11px; color: var(--accent2); font-size: 15px;
-      cursor: pointer; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center; transition: all 0.15s;
-    }
+    .del-btn { width: 38px; height: 40px; background: rgba(255,77,109,0.08); border: 1px solid rgba(255,77,109,0.2); border-radius: 11px; color: var(--accent2); font-size: 16px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
     .del-btn:active { background: rgba(255,77,109,0.2); }
 
-    /* Calc Button */
+    /* ── Calc Button ── */
     .calc-wrap { padding: 0 16px 14px; }
-    .calc-btn {
-      width: 100%; background: linear-gradient(135deg, var(--accent) 0%, #00c9a0 100%);
-      border: none; border-radius: 15px; padding: 15px;
-      font-family: 'Noto Sans KR', sans-serif; font-size: 15px; font-weight: 700;
-      color: #000; cursor: pointer; letter-spacing: 0.3px;
-      transition: opacity 0.15s, transform 0.1s, background 0.4s, box-shadow 0.4s;
-      box-shadow: 0 4px 20px rgba(0,229,160,0.22);
-    }
+    .calc-btn { width: 100%; background: linear-gradient(135deg, var(--accent) 0%, #00c9a0 100%); border: none; border-radius: 15px; padding: 15px; font-family: 'Noto Sans KR', sans-serif; font-size: 17px; font-weight: 700; color: #000; cursor: pointer; transition: opacity 0.15s, transform 0.1s, background 0.4s, box-shadow 0.4s; box-shadow: 0 4px 20px rgba(0,229,160,0.22); }
     body.usd .calc-btn { background: linear-gradient(135deg, var(--accent-usd) 0%, #818cf8 100%); box-shadow: 0 4px 20px rgba(96,165,250,0.22); }
     .calc-btn:active { opacity: 0.8; transform: scale(0.99); }
 
-    /* ── Result section ──────────────────────────── */
-    .result-section {
-      margin: 0 16px 14px; background: var(--card);
-      border: 1px solid var(--border); border-radius: 18px;
-      overflow: hidden; display: none;
-    }
-    .result-section.visible { display: block; }
-    .result-header {
-      padding: 12px 18px;
-      display: flex; align-items: center; justify-content: space-between;
-      border-bottom: 1px solid var(--border); background: var(--bg2);
-    }
-    .result-header-left { display: flex; align-items: center; gap: 9px; }
-    .cur-pill {
-      font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700;
-      padding: 3px 8px; border-radius: 6px;
-      background: rgba(255,209,102,0.12); color: var(--accent3); transition: all 0.3s;
-    }
-    body.usd .cur-pill { background: rgba(96,165,250,0.12); color: var(--accent-usd); }
+    /* ── Quick P&L Panel ── */
+    #quick-panel { display: none; margin: 0 16px 14px; }
+    #quick-panel.show { display: block; animation: fadeUp 0.3s ease; }
 
-    .result-grid {
-      padding: 16px 16px 4px;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    /* Status bar: 손익 at a glance */
+    .status-bar {
+      background: var(--card); border: 1px solid var(--border); border-radius: 18px;
+      padding: 16px 18px; margin-bottom: 10px;
     }
-    .result-card {
-      background: var(--bg3); border: 1px solid var(--border);
+    .status-bar-top {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .status-label { font-size: 13px; color: var(--text2); font-family: 'Space Mono', monospace; margin-bottom: 4px; }
+    .status-pl-val {
+      font-family: 'Space Mono', monospace; font-size: 31px; font-weight: 700; line-height: 1;
+      letter-spacing: -0.5px;
+    }
+    .status-pl-val.profit { color: var(--pos); }
+    .status-pl-val.loss   { color: var(--neg); }
+    .status-pl-sub { margin-top: 5px; font-size: 13px; color: var(--text2); font-family: 'Space Mono', monospace; }
+    .status-krw-tag { font-size: 15px; color: var(--text3); font-family: 'Space Mono', monospace; margin-top: 4px; }
+
+    .status-right { text-align: right; }
+    .status-badge {
+      display: inline-block; padding: 5px 12px; border-radius: 99px;
+      font-size: 15px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
+    }
+    .status-badge.profit { background: rgba(255,77,109,0.12); color: var(--pos); }
+    .status-badge.loss   { background: rgba(96,165,250,0.12); color: var(--neg); }
+
+    .status-metrics { display: none; }
+    .status-metric { background: var(--bg3); border: 1px solid var(--border); border-radius: 11px; padding: 10px 11px; }
+    .status-metric-label { font-size: 11px; color: var(--text3); font-family: 'Space Mono', monospace; margin-bottom: 5px; }
+    .status-metric-val { font-size: 13px; font-weight: 700; color: var(--text); font-family: 'Space Mono', monospace; }
+    .status-metric-krw { font-size: 11px; color: var(--text3); font-family: 'Space Mono', monospace; margin-top: 2px; }
+
+    /* ── Stepper Simulator ── */
+    .sim-section {
+      background: var(--card); border: 1px solid var(--border); border-radius: 18px; overflow: hidden;
+    }
+    .sim-body { padding: 16px 18px; }
+
+    .sim-stepper-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+    }
+    .sim-stepper-label { font-size: 14px; color: var(--text2); flex-shrink: 0; }
+    .stepper { display: flex; align-items: center; gap: 0; background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .stepper-btn {
+      width: 44px; height: 44px; border: none; background: transparent;
+      color: var(--text); font-size: 23px; font-weight: 300;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s; flex-shrink: 0; user-select: none; -webkit-user-select: none;
+    }
+    .stepper-btn:active { background: var(--bg2); }
+    .stepper-num {
+      flex: 1; text-align: center; font-family: 'Space Mono', monospace;
+      font-size: 20px; font-weight: 700; color: var(--text);
+      border: none; background: transparent; outline: none;
+      padding: 0; min-width: 0; -webkit-appearance: none;
+    }
+    .stepper-divider { width: 1px; height: 26px; background: var(--border); flex-shrink: 0; }
+
+    /* Sim result cards */
+    .sim-result-grid { display: flex; flex-direction: column; gap: 8px; }
+    .sim-result-row {
+      display: flex; align-items: stretch; gap: 8px;
+    }
+    .sim-card {
+      flex: 1; background: var(--bg3); border: 1px solid var(--border);
       border-radius: 13px; padding: 12px 14px;
     }
-    .result-card.highlight {
-      border-color: rgba(0,229,160,0.28);
-      background: linear-gradient(135deg, rgba(0,229,160,0.05) 0%, var(--bg3) 100%);
+    .sim-card.featured {
+      border-color: rgba(167,139,250,0.35);
+      background: linear-gradient(135deg, rgba(167,139,250,0.06) 0%, var(--bg3) 100%);
     }
-    body.usd .result-card.highlight {
-      border-color: rgba(96,165,250,0.28);
-      background: linear-gradient(135deg, rgba(96,165,250,0.05) 0%, var(--bg3) 100%);
-    }
+    .sim-card-label { font-size: 12px; color: var(--text2); font-family: 'Space Mono', monospace; margin-bottom: 6px; }
+    .sim-card-val { font-family: 'Space Mono', monospace; font-size: 17px; font-weight: 700; color: var(--text); }
+    .sim-card-val.purple { color: #a78bfa; }
+    .sim-card-val.green  { color: var(--neg); }
+    .sim-card-val.red    { color: var(--pos); }
+    .sim-card-sub { margin-top: 4px; font-size: 13px; color: var(--text2); font-family: 'Space Mono', monospace; }
+    .sim-card-krw { margin-top: 3px; font-size: 12px; color: var(--text3); font-family: 'Space Mono', monospace; }
 
-    /* ▶ Result labels — same style as field labels */
-    .result-label {
-      font-size: 11px; color: var(--text2);
-      font-family: 'Space Mono', monospace; letter-spacing: 0.2px;
-      margin-bottom: 7px;
+    /* arrow indicator */
+    .arrow-indicator { font-size: 12px; font-family: 'Space Mono', monospace; }
+    .arrow-indicator.better { color: var(--accent); }
+    body.usd .arrow-indicator.better { color: var(--accent-usd); }
+    .arrow-indicator.worse  { color: var(--accent2); }
+
+    /* exchange rate badge */
+    .fx-badge {
+      display: flex; align-items: center; gap: 5px;
+      padding: 6px 12px; background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 99px; width: fit-content; margin-top: 12px;
     }
-    /* ▶ Result values — consistent with input value size */
-    .result-value {
-      font-family: 'Space Mono', monospace;
-      font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.2;
-      word-break: break-all;
-    }
-    .result-value.big { font-size: 17px; }
+    .fx-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); flex-shrink: 0; }
+    .fx-text { font-size: 12px; color: var(--text2); font-family: 'Space Mono', monospace; }
+
+    /* ── Result section ── */
+    .result-section { margin: 0 16px 14px; background: var(--card); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; display: none; }
+    .result-section.visible { display: block; }
+    .result-header { padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); background: var(--bg2); }
+    .result-header-left { display: flex; align-items: center; gap: 9px; }
+    .cur-pill { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: rgba(255,209,102,0.12); color: var(--accent3); }
+    body.usd .cur-pill { background: rgba(96,165,250,0.12); color: var(--accent-usd); }
+    .result-grid { padding: 16px 16px 4px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .result-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 13px; padding: 12px 14px; }
+    .result-card.highlight { border-color: rgba(0,229,160,0.28); background: linear-gradient(135deg, rgba(0,229,160,0.05) 0%, var(--bg3) 100%); }
+    body.usd .result-card.highlight { border-color: rgba(96,165,250,0.28); background: linear-gradient(135deg, rgba(96,165,250,0.05) 0%, var(--bg3) 100%); }
+    .result-label { font-size: 13px; color: var(--text2); font-family: 'Space Mono', monospace; margin-bottom: 7px; }
+    .result-value { font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.2; word-break: break-all; }
+    .result-value.big { font-size: 19px; }
     .result-value.accent { color: var(--accent); }
     body.usd .result-value.accent { color: var(--accent-usd); }
     .result-value.red { color: var(--accent2); }
     .result-value.yellow { color: var(--accent3); }
-    /* ▶ Sub text — same color as label */
-    .result-sub { margin-top: 4px; font-size: 11px; color: var(--text2); font-family: 'Space Mono', monospace; }
-
-    /* Rate bar */
+    .result-sub { margin-top: 4px; font-size: 13px; color: var(--text2); font-family: 'Space Mono', monospace; }
     .rate-bar-wrap { padding: 14px 18px 16px; }
-    .rate-bar-labels {
-      display: flex; justify-content: space-between;
-      font-size: 10px; color: var(--text2);
-      font-family: 'Space Mono', monospace; margin-bottom: 6px;
-    }
-    .rate-bar-track {
-      height: 5px; background: var(--bg3);
-      border-radius: 99px; overflow: hidden; border: 1px solid var(--border);
-    }
-    .rate-bar-fill {
-      height: 100%; border-radius: 99px;
-      background: linear-gradient(90deg, var(--accent2), var(--accent3), var(--accent));
-      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
+    .rate-bar-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); font-family: 'Space Mono', monospace; margin-bottom: 6px; }
+    .rate-bar-track { height: 5px; background: var(--bg3); border-radius: 99px; overflow: hidden; border: 1px solid var(--border); }
+    .rate-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent2), var(--accent3), var(--accent)); transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); }
     body.usd .rate-bar-fill { background: linear-gradient(90deg, var(--accent2), var(--accent3), var(--accent-usd)); }
-    .rate-status {
-      text-align: center; margin-top: 6px;
-      font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text2);
-    }
-
-    /* Breakeven */
+    .rate-status { text-align: center; margin-top: 6px; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text2); }
     .breakeven-section { padding: 0 16px 16px; }
-    .breakeven-title {
-      font-size: 11px; color: var(--text2);
-      font-family: 'Space Mono', monospace; letter-spacing: 0.2px; margin-bottom: 9px;
-    }
+    .breakeven-title { font-size: 13px; color: var(--text2); font-family: 'Space Mono', monospace; margin-bottom: 9px; }
     .breakeven-rows { display: flex; flex-direction: column; gap: 5px; }
-    .breakeven-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 8px 11px;
-      background: var(--bg3); border: 1px solid var(--border); border-radius: 9px;
-    }
-    .be-label { font-size: 11px; color: var(--text2); }
-    .be-val {
-      font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
-      color: var(--accent3); text-align: right; max-width: 56%;
-    }
+    .breakeven-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 11px; background: var(--bg3); border: 1px solid var(--border); border-radius: 9px; }
+    .be-label { font-size: 13px; color: var(--text2); }
+    .be-val { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; color: var(--accent3); text-align: right; max-width: 56%; }
 
-    /* Reset */
     .reset-wrap { padding: 0 16px 8px; }
-    .reset-btn {
-      width: 100%; background: transparent; border: 1px solid var(--border);
-      border-radius: 13px; padding: 11px; color: var(--text3);
-      font-family: 'Noto Sans KR', sans-serif; font-size: 13px;
-      cursor: pointer; transition: all 0.2s;
-    }
+    .reset-btn { width: 100%; background: transparent; border: 1px solid var(--border); border-radius: 13px; padding: 11px; color: var(--text3); font-family: 'Noto Sans KR', sans-serif; font-size: 15px; cursor: pointer; transition: all 0.2s; }
     .reset-btn:active { border-color: var(--accent2); color: var(--accent2); }
 
-    /* Custom Alert Modal */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 999; padding: 24px;
-      opacity: 0; pointer-events: none; transition: opacity 0.2s;
-    }
+    /* ── Modal ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 999; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
     .modal-overlay.show { opacity: 1; pointer-events: all; }
-    .modal-box {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 18px; padding: 24px 20px;
-      width: 100%; max-width: 320px;
-      transform: translateY(12px); transition: transform 0.25s;
-    }
+    .modal-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 18px; padding: 24px 20px; width: 100%; max-width: 320px; transform: translateY(12px); transition: transform 0.25s; white-space: pre-line; }
     .modal-overlay.show .modal-box { transform: translateY(0); }
-    .modal-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
-    .modal-msg { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 20px; }
+    .modal-title { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .modal-msg { font-size: 15px; color: var(--text2); line-height: 1.6; margin-bottom: 20px; }
     .modal-btns { display: flex; gap: 8px; }
-    .modal-btn {
-      flex: 1; padding: 12px; border-radius: 12px;
-      font-family: 'Noto Sans KR', sans-serif; font-size: 14px; font-weight: 600;
-      cursor: pointer; border: none; transition: opacity 0.15s;
-    }
+    .modal-btn { flex: 1; padding: 12px; border-radius: 12px; font-family: 'Noto Sans KR', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; border: none; transition: opacity 0.15s; }
     .modal-btn:active { opacity: 0.75; }
     .modal-btn.primary { background: var(--accent); color: #000; }
     body.usd .modal-btn.primary { background: var(--accent-usd); }
     .modal-btn.secondary { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
     .modal-btn.danger { background: var(--accent2); color: #fff; }
 
-    @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── Chart ── */
+    .chart-section {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 18px; overflow: hidden;
+      margin: 0 16px 14px;
+    }
+    .badge-chart { background: rgba(255,209,102,0.12); color: var(--accent3); }
+    .chart-body { padding: 14px 14px 10px; }
+    #avg-chart { display: block; width: 100%; cursor: crosshair; touch-action: none; }
+    .chart-zoom-btn {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text2); font-size: 17px; font-weight: 300;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s; line-height: 1; padding: 0;
+    }
+    .chart-zoom-btn:active { background: var(--bg2); color: var(--text); }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
     .result-section.visible { animation: fadeUp 0.3s ease; }
 
     input[type=number]::-webkit-inner-spin-button,
@@ -358,7 +284,7 @@
     <div class="header-icon">📉</div>
     <div class="header-text">
       <h1>물타기 계산기</h1>
-      <p id="header-sub">KRW · AVERAGING DOWN</p>
+      <p id="header-sub" style="display:none"></p>
     </div>
   </div>
   <div class="currency-toggle">
@@ -377,8 +303,7 @@
 <!-- 현재 보유 -->
 <div class="section" id="section-hold">
   <div class="section-header">
-    <span class="section-badge badge-hold">HOLD</span>
-    <span class="section-title">현재 보유 중인 주식</span>
+    <span class="section-title" style="font-size: 14px;font-weight:600;color:var(--text2)">현재 보유 중인 주식</span>
   </div>
   <div class="fields">
     <div class="field-row">
@@ -398,7 +323,7 @@
       </div>
     </div>
     <div class="field">
-      <label>현재 주가 <span class="opt-tag">(선택)</span></label>
+      <label>현재 주가 <span class="opt-tag">(선택 — 입력 시 현황 자동 계산)</span></label>
       <div class="input-wrap">
         <input type="number" id="current_price" placeholder="42000" inputmode="decimal">
         <span class="unit price-unit">원</span>
@@ -407,11 +332,177 @@
   </div>
 </div>
 
-<!-- 추가 매수 -->
+<!-- ── Quick P&L + Simulator Panel ────────────────────── -->
+<div id="quick-panel">
+
+  <!-- 현재 손익 현황 -->
+  <div class="status-bar" id="status-bar">
+    <div class="status-bar-top">
+      <div>
+        <div class="status-label">현재 손익</div>
+        <div class="status-pl-val" id="sq-pl-val">—</div>
+        <div class="status-krw-tag" id="sq-pl-krw" style="display:none"></div>
+        <div style="margin-top:6px;display:flex;align-items:center;gap:6px">
+          <span id="sq-status-chip" style="display:inline-block;padding:2px 9px;border-radius:99px;font-size: 12px;font-weight:700;font-family:'Space Mono',monospace"></span>
+        </div>
+      </div>
+      <!-- 환율 배지 (우측 상단) — USD 모드에서만 표시 -->
+      <div class="status-right" style="display:flex;align-items:flex-start">
+        <div class="fx-badge" id="fx-badge-top" style="display:none;margin-top:0">
+          <div class="fx-dot"></div>
+          <div class="fx-text" id="fx-text-top">환율 조회 중…</div>
+        </div>
+      </div>
+      <!-- hidden compat elements -->
+      <div style="display:none">
+        <div id="sq-badge"></div>
+        <div id="sq-recover-wrap">
+          <div id="sq-recover-label"></div>
+          <div id="sq-recover-val"></div>
+          <div id="sq-recover-sub"></div>
+        </div>
+      </div>
+    </div>
+    <div class="status-metrics">
+      <div class="status-metric">
+        <div class="status-metric-label">투자원금</div>
+        <div class="status-metric-val" id="sq-cost">—</div>
+        <div class="status-metric-krw" id="sq-cost-krw"></div>
+      </div>
+      <div class="status-metric">
+        <div class="status-metric-label">현재평가액</div>
+        <div class="status-metric-val" id="sq-eval">—</div>
+        <div class="status-metric-krw" id="sq-eval-krw"></div>
+      </div>
+      <div class="status-metric">
+        <div class="status-metric-label">손익분기가</div>
+        <div class="status-metric-val" id="sq-be">—</div>
+        <div class="status-metric-krw" id="sq-be-krw"></div>
+      </div>
+    </div>
+
+    <!-- 회복 힌트 bar (손실 시) -->
+    <div id="sq-hint-bar" style="display:none;margin-top:10px;padding:9px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:11px;font-size: 12px;color:var(--text2);font-family:'Space Mono',monospace;line-height:1.7">
+      <span id="sq-hint-text"></span>
+    </div>
+
+    <!-- 환율 badge (하단 — hidden, 상단으로 이동) -->
+    <div style="display:none" id="fx-badge">
+      <div id="fx-text"></div>
+    </div>
+  </div>
+
+  <!-- 추가 매수 시뮬레이터 -->
+  <div class="sim-section">
+    <div class="section-header">
+      <span class="section-title" style="font-size: 14px;font-weight:600;color:var(--text2)">지금 몇 주 더 사면?</span>
+    </div>
+    <div class="sim-body">
+
+      <!-- 현재가 표시 및 수정 -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="font-size: 13px;color:var(--text2);font-family:'Space Mono',monospace;flex-shrink:0">현재가</span>
+        <div class="input-wrap" style="flex:1">
+          <input type="number" id="sim-cur-price" inputmode="decimal"
+            placeholder="0"
+            style="border-radius:10px;padding:9px 36px 9px 12px;font-size: 15px">
+          <span class="unit price-unit" style="font-size: 12px">원</span>
+        </div>
+
+      </div>
+
+      <div class="sim-stepper-row">
+        <div class="stepper">
+          <button class="stepper-btn" id="step-minus">−</button>
+          <div class="stepper-divider"></div>
+          <input type="number" class="stepper-num" id="sim-qty" value="1" min="1" inputmode="numeric">
+          <div class="stepper-divider"></div>
+          <button class="stepper-btn" id="step-plus">＋</button>
+        </div>
+        <div class="sim-stepper-label">주 추가 매수 시</div>
+      </div>
+
+      <div class="sim-result-grid">
+        <!-- Row 1: new avg arrow + change pct -->
+        <div class="sim-result-row">
+          <div class="sim-card featured" style="flex:1">
+            <div class="sim-card-label">새 평균단가</div>
+            <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+              <span class="sim-card-val" id="sim-orig-avg" style="color:var(--text3)">—</span>
+              <span style="color:var(--text3);font-size: 14px">→</span>
+              <span class="sim-card-val purple" id="sim-new-avg">—</span>
+              <span class="sim-card-val" id="sim-avg-chg-pct" style="font-size: 13px">—</span>
+            </div>
+            <div class="sim-card-krw" id="sim-new-avg-krw"></div>
+            <div style="margin-top:10px;padding-top:9px;border-top:1px solid var(--border)">
+              <div class="sim-card-label" style="margin-bottom:4px">추가 매수 후 손익</div>
+              <div style="display:flex;align-items:baseline;gap:6px">
+                <span id="sim-new-pl" class="sim-card-val" style="font-size: 15px">—</span>
+                <span id="sim-new-pl-rate" style="font-size: 12px;font-family:'Space Mono',monospace;color:var(--text3)"></span>
+              </div>
+              <div class="sim-card-krw" id="sim-new-pl-krw"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Row 2: 투자원금 / 추가 투자금 / 총 투자금 -->
+        <div class="sim-result-row" style="align-items:stretch">
+          <div class="sim-card" style="flex:1;display:flex;flex-direction:column;justify-content:space-between">
+            <div class="sim-card-label">투자원금</div>
+            <div>
+              <div class="sim-card-val" id="sim-orig-cost">—</div>
+              <div id="sim-orig-cost-krw" style="margin-top:4px;font-size:11px;color:var(--text3);font-family:'Space Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+            </div>
+          </div>
+          <div class="sim-card" style="flex:1;display:flex;flex-direction:column;justify-content:space-between">
+            <div class="sim-card-label">추가 투자금</div>
+            <div>
+              <div class="sim-card-val" id="sim-add-cost">—</div>
+              <div id="sim-add-cost-krw" style="margin-top:4px;font-size:11px;color:var(--text3);font-family:'Space Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+            </div>
+          </div>
+          <div class="sim-card" style="flex:1;display:flex;flex-direction:column;justify-content:space-between">
+            <div class="sim-card-label">총 투자금</div>
+            <div>
+              <div class="sim-card-val" id="sim-total-cost">—</div>
+              <div id="sim-total-cost-krw" style="margin-top:4px;font-size:11px;color:var(--text3);font-family:'Space Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+            </div>
+          </div>
+        </div>
+        <!-- hidden els for JS compat -->
+        <div style="display:none">
+          <span id="sim-avg-chg-amt"></span>
+          <span id="sim-avg-chg-krw"></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- ── end quick panel ── -->
+
+<!-- 평단가 변화 차트 (quick-panel과 같은 레벨) -->
+<div class="chart-section" id="chart-section" style="display:none">
+  <div class="section-header" style="justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:9px">
+      <span class="section-badge badge-chart">CHART</span>
+      <span class="section-title">추가 투자금액별 평단가 변화</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:5px">
+      <span id="chart-zoom-label" style="font-family:'Space Mono',monospace;font-size: 11px;color:var(--text3);margin-right:2px">32×</span>
+      <button id="chart-zoom-in"  class="chart-zoom-btn">＋</button>
+      <button id="chart-zoom-out" class="chart-zoom-btn">−</button>
+    </div>
+  </div>
+  <div class="chart-body">
+    <canvas id="avg-chart" height="180"></canvas>
+  </div>
+</div>
+
+<!-- 추가 매수 (상세) -->
 <div class="section">
   <div class="section-header">
     <span class="section-badge badge-buy">BUY</span>
-    <span class="section-title">추가 매수 (물타기)</span>
+    <span class="section-title">추가 매수 상세 계산</span>
   </div>
   <div class="fields" id="buy-rows">
     <div class="field-row" data-idx="0">
@@ -436,17 +527,16 @@
   </div>
 </div>
 
-<!-- 계산 -->
 <div class="calc-wrap">
   <button class="calc-btn" id="calc-btn">계산하기</button>
 </div>
 
-<!-- 결과 -->
+<!-- 상세 결과 -->
 <div class="result-section" id="result-section">
   <div class="result-header">
     <div class="result-header-left">
       <span class="section-badge badge-res">RESULT</span>
-      <span class="section-title">계산 결과</span>
+      <span class="section-title">상세 계산 결과</span>
     </div>
     <span class="cur-pill" id="result-cur-pill">KRW</span>
   </div>
@@ -479,22 +569,10 @@
   <div class="breakeven-section">
     <div class="breakeven-title">손익분기 정보</div>
     <div class="breakeven-rows">
-      <div class="breakeven-row">
-        <span class="be-label">📌 손익분기점 (평단가)</span>
-        <span class="be-val" id="be-breakeven">—</span>
-      </div>
-      <div class="breakeven-row">
-        <span class="be-label">💸 원금 회복 수익률</span>
-        <span class="be-val" id="be-recover">—</span>
-      </div>
-      <div class="breakeven-row">
-        <span class="be-label">📉 현재 손실률</span>
-        <span class="be-val" id="be-loss" style="color:var(--accent2)">—</span>
-      </div>
-      <div class="breakeven-row">
-        <span class="be-label">💰 추가 투자금액</span>
-        <span class="be-val" id="be-added">—</span>
-      </div>
+      <div class="breakeven-row"><span class="be-label">📌 손익분기점 (평단가)</span><span class="be-val" id="be-breakeven">—</span></div>
+      <div class="breakeven-row"><span class="be-label">💸 원금 회복 수익률</span><span class="be-val" id="be-recover">—</span></div>
+      <div class="breakeven-row"><span class="be-label">📉 현재 손실률</span><span class="be-val" id="be-loss" style="color:var(--accent2)">—</span></div>
+      <div class="breakeven-row"><span class="be-label">💰 추가 투자금액</span><span class="be-val" id="be-added">—</span></div>
     </div>
   </div>
 </div>
@@ -513,388 +591,923 @@
 </div>
 
 <script>
-// ── Service Worker ──────────────────────────────────────────────
+// ── Service Worker ─────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
-  const sw = `const C='sv3';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['./','.\/index.html']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;
+  const sw = `const C='sv4';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['./','.\/index.html']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;
   navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});
 }
 
-// ── Storage helpers (localStorage — works locally & on server) ──
-function saveCookie(data) {
-  try { localStorage.setItem('stockAvg_v3', JSON.stringify(data)); } catch(e) {}
-}
-function loadCookie() {
-  try {
-    const raw = localStorage.getItem('stockAvg_v3');
-    return raw ? JSON.parse(raw) : null;
-  } catch(e) { return null; }
-}
+// ── Storage ────────────────────────────────────────────────────
+function saveData(d) { try { localStorage.setItem('stockAvg_v4', JSON.stringify(d)); } catch(e) {} }
+function loadData() { try { const r=localStorage.getItem('stockAvg_v4'); return r?JSON.parse(r):null; } catch(e){return null;} }
 
-// ── Currency config ─────────────────────────────────────────────
+// ── Currency ───────────────────────────────────────────────────
 const CUR = {
   krw: {
     unit:'원', ph_price:'50000', ph_buy:'40000', ph_cur:'42000',
-    fmt: n => Math.round(n).toLocaleString('ko-KR')+'원',
+    fmt:  n => Math.round(n).toLocaleString('ko-KR')+'원',
     fmtD: n => (n>=0?'+':'')+Math.round(n).toLocaleString('ko-KR')+'원',
+    fmtS: n => (n>=0?'$+':'$')+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),
     sub:'KRW · AVERAGING DOWN', pill:'KRW',
   },
   usd: {
     unit:'$', ph_price:'150.00', ph_buy:'130.00', ph_cur:'135.00',
-    fmt: n => '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),
+    fmt:  n => '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),
     fmtD: n => (n>=0?'+$':'-$')+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),
     sub:'USD · AVERAGING DOWN', pill:'USD',
   },
 };
 let currency = 'krw';
 
-// ── State ───────────────────────────────────────────────────────
-// tabs: [{label, currency, holdPrice, holdQty, curPrice, buys:[{price,qty}]}]
+// ── Exchange rate ──────────────────────────────────────────────
+let usdKrw = null;    // fetched rate
+let fxFetched = false;
+
+async function fetchExchangeRate() {
+  if (fxFetched) return;
+  try {
+    const res = await fetch('https://open.er-api.com/v6/latest/USD');
+    const json = await res.json();
+    if (json && json.rates && json.rates.KRW) {
+      usdKrw = json.rates.KRW;
+      fxFetched = true;
+      updateFxBadge();
+      updateQuickPanel(); // refresh display with rate
+    }
+  } catch(e) {
+    // silently fail — KRW tags just won't show
+  }
+}
+
+function updateFxBadge() {
+  // 상단 배지 (status-bar 우측)
+  const topBadge = document.getElementById('fx-badge-top');
+  const topText  = document.getElementById('fx-text-top');
+  if (!topBadge) return;
+  if (currency !== 'usd') { topBadge.style.display = 'none'; return; }
+  topBadge.style.display = 'flex';
+  if (usdKrw) {
+    const d = new Date();
+    const txt = `1 USD = ${Math.round(usdKrw).toLocaleString('ko-KR')}원  (${d.getMonth()+1}/${d.getDate()} 기준)`;
+    topText.textContent = txt;
+    document.getElementById('fx-text').textContent = txt; // compat
+  } else {
+    topText.textContent = '환율 조회 중…';
+  }
+}
+
+// Convert USD amount to KRW string
+function toKrwTag(usdAmt) {
+  if (!usdKrw || currency !== 'usd') return '';
+  return '≈ ' + Math.round(usdAmt * usdKrw).toLocaleString('ko-KR') + '원';
+}
+
+// ── State ──────────────────────────────────────────────────────
 let state = { tabs:[], active:0 };
 
 function getToday() {
   const d = new Date();
   return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
 }
-
 function newTab(label, cur) {
-  return { label, currency: cur||'krw', holdPrice:'', holdQty:'', curPrice:'', buys:[{price:'',qty:''}] };
+  return { label, currency:cur||'krw', holdPrice:'', holdQty:'', curPrice:'', buys:[{price:'',qty:''}] };
 }
 
 function initState() {
-  const saved = loadCookie();
+  const saved = loadData();
   if (saved && saved.tabs && saved.tabs.length > 0) {
     state = saved;
-    if (state.active >= state.tabs.length) state.active = state.tabs.length - 1;
-    // restore last used currency before loading tab UI
-    if (state.lastCurrency) {
-      currency = state.lastCurrency;
-      applyUIForCurrency();
-    }
+    if (state.active >= state.tabs.length) state.active = state.tabs.length-1;
+    if (state.lastCurrency) { currency = state.lastCurrency; applyUIForCurrency(); }
   } else {
-    state = { tabs: [newTab(getToday())], active: 0 };
-    saveCookie(state);
+    state = { tabs:[newTab(getToday())], active:0 };
+    saveData(state);
   }
   renderTabs();
   loadTab(state.active);
 }
 
-// ── Tab rendering ───────────────────────────────────────────────
+// ── Tabs ───────────────────────────────────────────────────────
 function renderTabs() {
   const scroll = document.getElementById('tab-scroll');
   scroll.innerHTML = '';
   state.tabs.forEach((t, i) => {
     const btn = document.createElement('button');
-    btn.className = 'tab-btn' + (i === state.active ? ' active' : '');
+    btn.className = 'tab-btn'+(i===state.active?' active':'');
     btn.textContent = t.label;
-    btn.addEventListener('click', () => switchTab(i));
+    btn.addEventListener('click', ()=>switchTab(i));
     scroll.appendChild(btn);
   });
-  // scroll active into view
-  setTimeout(() => {
-    const active = scroll.querySelector('.tab-btn.active');
-    if (active) active.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'nearest' });
-  }, 50);
+  setTimeout(()=>{
+    const a = scroll.querySelector('.tab-btn.active');
+    if(a) a.scrollIntoView({behavior:'smooth',block:'nearest',inline:'nearest'});
+  },50);
 }
 
-// ── Tab switching ───────────────────────────────────────────────
 function switchTab(idx) {
-  saveCurrentInputsToTab(state.active); // auto-save current before switching
+  saveCurrentInputsToTab(state.active);
   state.active = idx;
-  saveCookie(state);
+  saveData(state);
   renderTabs();
   loadTab(idx);
   hideResult();
 }
 
 function saveCurrentInputsToTab(idx) {
-  const tab = state.tabs[idx];
-  if (!tab) return;
+  const tab = state.tabs[idx]; if(!tab) return;
   tab.holdPrice = document.getElementById('hold_price').value;
   tab.holdQty   = document.getElementById('hold_qty').value;
   tab.curPrice  = document.getElementById('current_price').value;
   tab.currency  = currency;
-
-  const prices = document.querySelectorAll('.buy-price');
-  const qtys   = document.querySelectorAll('.buy-qty');
+  const bp = document.querySelectorAll('.buy-price');
+  const bq = document.querySelectorAll('.buy-qty');
   tab.buys = [];
-  for (let i = 0; i < prices.length; i++) {
-    tab.buys.push({ price: prices[i].value, qty: qtys[i] ? qtys[i].value : '' });
-  }
+  for(let i=0;i<bp.length;i++) tab.buys.push({price:bp[i].value, qty:bq[i]?bq[i].value:''});
 }
 
 function loadTab(idx) {
-  const tab = state.tabs[idx];
-  if (!tab) return;
-
-  // Set currency first
-  if (tab.currency && tab.currency !== currency) {
-    currency = tab.currency;
-    applyUIForCurrency();
-  }
-
-  // Fill inputs
-  document.getElementById('hold_price').value   = tab.holdPrice || '';
-  document.getElementById('hold_qty').value     = tab.holdQty || '';
-  document.getElementById('current_price').value = tab.curPrice || '';
-
-  // Clear and rebuild buy rows
-  document.querySelectorAll('.extra-row').forEach(r => r.remove());
-  const firstRow = document.querySelector('#buy-rows .field-row[data-idx="0"]');
-  const buys = tab.buys && tab.buys.length > 0 ? tab.buys : [{price:'',qty:''}];
-
-  // first row
-  firstRow.querySelector('.buy-price').value = buys[0].price || '';
-  firstRow.querySelector('.buy-qty').value   = buys[0].qty   || '';
-
-  // extra rows
+  const tab = state.tabs[idx]; if(!tab) return;
+  if(tab.currency && tab.currency!==currency) { currency=tab.currency; applyUIForCurrency(); }
+  document.getElementById('hold_price').value    = tab.holdPrice||'';
+  document.getElementById('hold_qty').value      = tab.holdQty||'';
+  document.getElementById('current_price').value = tab.curPrice||'';
+  const _sc = document.getElementById('sim-cur-price');
+  if (_sc) _sc.value = tab.curPrice||'';
+  document.querySelectorAll('.extra-row').forEach(r=>r.remove());
+  const first = document.querySelector('#buy-rows .field-row[data-idx="0"]');
+  const buys  = (tab.buys && tab.buys.length>0) ? tab.buys : [{price:'',qty:''}];
+  first.querySelector('.buy-price').value = buys[0].price||'';
+  first.querySelector('.buy-qty').value   = buys[0].qty||'';
   rowCount = 1;
-  for (let i = 1; i < buys.length; i++) {
-    addRowWithValues(buys[i].price, buys[i].qty);
-  }
+  for(let i=1;i<buys.length;i++) addRowWith(buys[i].price, buys[i].qty);
+  updateQuickPanel();
 }
 
-// ── Add Row ─────────────────────────────────────────────────────
-let rowCount = 1;
-
-document.getElementById('add-row-btn').addEventListener('click', () => {
-  addRowWithValues('', '');
-});
-
-function addRowWithValues(priceVal, qtyVal) {
-  rowCount++;
-  const c = CUR[currency];
-  const wrap = document.createElement('div');
-  wrap.className = 'extra-row';
-  wrap.innerHTML = `
-    <div class="field">
-      <label>매수가 #${rowCount}</label>
-      <div class="input-wrap">
-        <input type="number" class="buy-price" placeholder="${c.ph_buy}" inputmode="decimal" value="${priceVal}">
-        <span class="unit price-unit">${c.unit}</span>
-      </div>
-    </div>
-    <div class="field">
-      <label>수량</label>
-      <div class="input-wrap">
-        <input type="number" class="buy-qty" placeholder="50" inputmode="decimal" value="${qtyVal}">
-        <span class="unit">주</span>
-      </div>
-    </div>
-    <button class="del-btn" onclick="this.parentElement.remove()">✕</button>
-  `;
-  document.getElementById('add-row-btn').parentElement.before(wrap);
-}
-
-// ── Tab Add ─────────────────────────────────────────────────────
-document.getElementById('tab-add-btn').addEventListener('click', () => {
-  if (state.tabs.length >= 5) {
-    showModal('탭 최대치 도달', '최대 5개의 날짜 탭을 사용할 수 있습니다.\n기존 탭을 삭제 후 추가해 주세요.', [
-      { label:'확인', cls:'primary', cb: closeModal },
-    ]); return;
+document.getElementById('tab-add-btn').addEventListener('click',()=>{
+  if(state.tabs.length>=5){
+    showModal('탭 최대치 도달','최대 5개까지 사용 가능합니다.\n기존 탭을 삭제 후 추가해 주세요.',[{label:'확인',cls:'primary',cb:closeModal}]);return;
   }
   const today = getToday();
-  const existing = state.tabs.filter(t => t.label === today || t.label.startsWith(today+'('));
-  if (existing.length > 0) {
-    showModal(
-      '오늘 날짜가 이미 존재합니다',
-      `${today} 탭이 이미 있습니다.\n추가로 생성하시겠습니까?`,
-      [
-        { label:'추가 생성', cls:'primary', cb: () => { closeModal(); createTab(today, existing.length); } },
-        { label:'아니요',    cls:'secondary', cb: closeModal },
-      ]
-    );
-  } else {
-    createTab(today, 0);
-  }
+  const dup = state.tabs.filter(t=>t.label===today||t.label.startsWith(today+'(')).length;
+  if(dup>0){
+    showModal('오늘 날짜가 이미 존재합니다',`${today} 탭이 이미 있습니다.\n추가로 생성하시겠습니까?`,[
+      {label:'추가 생성',cls:'primary',cb:()=>{closeModal();createTab(today,dup);}},
+      {label:'아니요',cls:'secondary',cb:closeModal},
+    ]);
+  } else { createTab(today,0); }
 });
 
-function createTab(base, dupCount) {
+function createTab(base,dupCount) {
   saveCurrentInputsToTab(state.active);
-  const label = dupCount > 0 ? `${base}(${dupCount})` : base;
-  state.tabs.push(newTab(label, currency));
-  state.active = state.tabs.length - 1;
-  saveCookie(state);
-  renderTabs();
-  loadTab(state.active);
-  hideResult();
+  const label = dupCount>0?`${base}(${dupCount})`:base;
+  state.tabs.push(newTab(label,currency));
+  state.active = state.tabs.length-1;
+  saveData(state);
+  renderTabs(); loadTab(state.active); hideResult();
 }
 
-// ── Tab Delete ──────────────────────────────────────────────────
-document.getElementById('tab-del-btn').addEventListener('click', () => {
-  if (state.tabs.length <= 1) {
-    showModal('삭제 불가', '마지막 탭은 삭제할 수 없습니다.', [
-      { label:'확인', cls:'primary', cb: closeModal }
-    ]); return;
+document.getElementById('tab-del-btn').addEventListener('click',()=>{
+  if(state.tabs.length<=1){
+    showModal('삭제 불가','마지막 탭은 삭제할 수 없습니다.',[{label:'확인',cls:'primary',cb:closeModal}]);return;
   }
   const label = state.tabs[state.active].label;
-  showModal(
-    '탭 삭제',
-    `[${label}] 탭을 삭제하시겠습니까?\n저장된 데이터가 모두 사라집니다.`,
-    [
-      { label:'삭제', cls:'danger', cb: () => { closeModal(); deleteActiveTab(); } },
-      { label:'아니요', cls:'secondary', cb: closeModal },
-    ]
-  );
+  showModal('탭 삭제',`[${label}] 탭을 삭제하시겠습니까?\n저장된 데이터가 모두 사라집니다.`,[
+    {label:'삭제',cls:'danger',cb:()=>{closeModal();deleteActiveTab();}},
+    {label:'아니요',cls:'secondary',cb:closeModal},
+  ]);
 });
 
 function deleteActiveTab() {
-  state.tabs.splice(state.active, 1);
-  state.active = Math.max(0, state.active - 1);
-  saveCookie(state);
-  renderTabs();
-  loadTab(state.active);
-  hideResult();
+  state.tabs.splice(state.active,1);
+  state.active=Math.max(0,state.active-1);
+  saveData(state); renderTabs(); loadTab(state.active); hideResult();
 }
 
-// ── Currency ────────────────────────────────────────────────────
+// ── Currency ───────────────────────────────────────────────────
 function setCurrency(cur) {
-  currency = cur;
-  applyUIForCurrency();
-  hideResult();
-  state.tabs[state.active].currency = cur;
-  state.lastCurrency = cur;  // remember globally for next open
-  saveCookie(state);
+  currency=cur; applyUIForCurrency(); hideResult();
+  state.tabs[state.active].currency=cur; state.lastCurrency=cur; saveData(state);
+  updateFxBadge();
+  if(cur==='usd') fetchExchangeRate();
+  updateQuickPanel();
 }
 
 function applyUIForCurrency() {
-  const c = CUR[currency];
-  document.getElementById('btn-krw').classList.toggle('active', currency==='krw');
-  document.getElementById('btn-usd').classList.toggle('active', currency==='usd');
-  document.body.classList.toggle('usd', currency==='usd');
-  document.getElementById('header-sub').textContent = c.sub;
-  document.getElementById('result-cur-pill').textContent = c.pill;
-  document.querySelectorAll('.price-unit').forEach(el => el.textContent = c.unit);
-  document.getElementById('hold_price').placeholder = c.ph_price;
-  document.getElementById('current_price').placeholder = c.ph_cur;
-  document.querySelectorAll('.buy-price').forEach(el => el.placeholder = c.ph_buy);
+  const c=CUR[currency];
+  document.getElementById('btn-krw').classList.toggle('active',currency==='krw');
+  document.getElementById('btn-usd').classList.toggle('active',currency==='usd');
+  document.body.classList.toggle('usd',currency==='usd');
+  document.getElementById('header-sub').textContent=c.sub;
+  document.getElementById('result-cur-pill').textContent=c.pill;
+  document.querySelectorAll('.price-unit').forEach(el=>el.textContent=c.unit);
+  document.getElementById('hold_price').placeholder=c.ph_price;
+  document.getElementById('current_price').placeholder=c.ph_cur;
+  const _scp = document.getElementById('sim-cur-price');
+  if (_scp) _scp.placeholder = c.ph_cur;
+  document.querySelectorAll('.buy-price').forEach(el=>el.placeholder=c.ph_buy);
 }
 
-// ── Calculate ───────────────────────────────────────────────────
-const fmtN = n => n.toLocaleString('ko-KR')+'주';
-const pct  = n => (n>=0?'+':'')+n.toFixed(2)+'%';
+// ── Quick Panel ────────────────────────────────────────────────
+function updateQuickPanel() {
+  const hp  = parseFloat(document.getElementById('hold_price').value);
+  const hq  = parseFloat(document.getElementById('hold_qty').value);
+  const cp  = parseFloat(document.getElementById('current_price').value)||null;
+  const panel = document.getElementById('quick-panel');
+
+  const chartEl = document.getElementById('chart-section');
+  if(!hp||!hq||hp<=0||hq<=0||!cp) {
+    panel.classList.remove('show');
+    if(chartEl) chartEl.style.display='none';
+    return;
+  }
+  panel.classList.add('show');
+  if(chartEl) chartEl.style.display='block';
+
+  const c = CUR[currency];
+  const cost   = hp*hq;
+  const eval_  = cp*hq;
+  const pl     = eval_-cost;
+  const plRate = (pl/cost)*100;
+  const isProfit = pl>=0;
+
+  // P&L big number — with sign
+  const plEl = document.getElementById('sq-pl-val');
+  plEl.textContent = (isProfit ? '+' : '-') + c.fmt(Math.abs(pl));
+  plEl.className = 'status-pl-val'; plEl.style.color = isProfit ? 'var(--pos)' : 'var(--neg)';
+
+  // Status chip (수익 중 / 손실 중)
+  const chip = document.getElementById('sq-status-chip');
+  chip.textContent = isProfit ? '▲ 수익 중' : '▼ 손실 중';
+  chip.style.background = isProfit ? 'rgba(255,77,109,0.12)' : 'rgba(96,165,250,0.12)';
+  chip.style.color = isProfit ? 'var(--pos)' : 'var(--neg)';
+
+  const krwTag = toKrwTag(Math.abs(pl));
+  const krwEl = document.getElementById('sq-pl-krw');
+  if(krwTag){
+    const krwSign = isProfit ? '+' : '-';
+    const krwNum  = krwTag.replace('≈ ','');
+    krwEl.textContent = '(' + krwSign + krwNum + ')';
+    krwEl.style.display='block';
+    krwEl.style.color = isProfit ? 'var(--pos)' : 'var(--neg)';
+    krwEl.style.opacity = '0.75';
+  } else { krwEl.style.display='none'; }
+
+  const badge = document.getElementById('sq-badge');
+  badge.textContent = (isProfit?'+':'')+plRate.toFixed(2)+'%';
+  badge.style.background = isProfit ? 'rgba(255,77,109,0.12)' : 'rgba(96,165,250,0.12)';
+  badge.style.color = isProfit ? 'var(--pos)' : 'var(--neg)';
+  badge.className = 'status-badge';
+
+  // Recover section (right side)
+  const recoverWrap = document.getElementById('sq-recover-wrap');
+  if (!isProfit) {
+    const recoverPct = ((hp - cp) / cp) * 100;   // % rise needed from curPrice → holdPrice
+    const recoverAmt = hp - cp;                    // per share amount needed
+    document.getElementById('sq-recover-label').textContent = '손익분기까지';
+    document.getElementById('sq-recover-val').textContent = '+'+recoverPct.toFixed(2)+'% 필요';
+    document.getElementById('sq-recover-sub').textContent = '+'+c.fmt(recoverAmt)+'/주 오르면 본전';
+    recoverWrap.style.display = 'block';
+  } else {
+    document.getElementById('sq-recover-label').textContent = '현재 수익률';
+    document.getElementById('sq-recover-val').textContent = '+'+plRate.toFixed(2)+'%';
+    document.getElementById('sq-recover-sub').textContent = '';
+    recoverWrap.style.display = 'block';
+  }
+
+  // Hint bar
+  const hintBar  = document.getElementById('sq-hint-bar');
+  const hintText = document.getElementById('sq-hint-text');
+  if (!isProfit) {
+    const totalLoss = Math.abs(pl);
+    const perShare  = Math.abs(hp - cp);
+    const recPct    = ((hp - cp) / cp * 100).toFixed(2);
+    hintBar.style.display = 'block';
+    hintText.innerHTML =
+      `현재가 <b style="color:var(--text)">${c.fmt(cp)}</b>에서 `+
+      `<b style="color:var(--accent3)">${recPct}%</b> 상승 시 원금 회복`;
+  } else {
+    hintBar.style.display = 'none';
+  }
+
+  // Metrics
+  document.getElementById('sq-cost').textContent = c.fmt(cost);
+  document.getElementById('sq-eval').textContent = c.fmt(eval_);
+  document.getElementById('sq-be').textContent   = c.fmt(hp);
+
+  // KRW tags for metrics
+  document.getElementById('sq-cost-krw').textContent = toKrwTag(cost);
+  document.getElementById('sq-eval-krw').textContent = toKrwTag(eval_);
+  document.getElementById('sq-be-krw').textContent   = toKrwTag(hp);
+
+  updateFxBadge();
+  updateSimulator(hp, hq, cp);
+  drawChart(hp, hq, cp);
+}
+
+// ── Simulator ─────────────────────────────────────────────────
+function updateSimulator(holdPrice, holdQty, curPrice) {
+  const simQty = Math.max(1, parseInt(document.getElementById('sim-qty').value)||1);
+  const c = CUR[currency];
+  const isUSD = currency==='usd';
+
+  const origCost  = holdPrice*holdQty;
+  const origPl    = curPrice*holdQty-origCost;
+  const origPlRate= (origPl/origCost)*100;
+
+  const addCost   = curPrice*simQty;
+  const newQty    = holdQty+simQty;
+  const totalCost = origCost+addCost;
+  const newAvg    = totalCost/newQty;
+  const newEval   = curPrice*newQty;
+  const newPl     = newEval-totalCost;
+  const newPlRate = (newPl/totalCost)*100;
+  const avgChange = ((newAvg-holdPrice)/holdPrice)*100;
+  const plImprove = newPlRate-origPlRate; // how many % points improved
+
+  // Row 1: $orig → $newAvg  +/-X%
+  document.getElementById('sim-orig-avg').textContent = c.fmt(holdPrice);
+  document.getElementById('sim-new-avg').textContent  = c.fmt(newAvg);
+  const krwNewAvg = toKrwTag(newAvg);
+  document.getElementById('sim-new-avg-krw').textContent = krwNewAvg ? '≈ '+krwNewAvg.replace('≈ ','') : '';
+
+  // 평단 변화 % 뱃지 — 하락=파란(--neg), 상승=빨간(--pos)
+  const avgDiffAmt = newAvg - holdPrice;
+  const isAvgDown  = avgDiffAmt < 0;
+  const avgChgEl = document.getElementById('sim-avg-chg-pct');
+  avgChgEl.textContent = (avgChange>=0?'+':'')+avgChange.toFixed(2)+'%';
+  avgChgEl.style.color      = isAvgDown ? 'var(--neg)' : 'var(--pos)';
+  avgChgEl.style.background = isAvgDown ? 'rgba(96,165,250,0.12)' : 'rgba(255,77,109,0.12)';
+  avgChgEl.style.padding    = '1px 7px';
+  avgChgEl.style.borderRadius = '6px';
+  document.getElementById('sim-avg-chg-amt').textContent = '';
+  document.getElementById('sim-avg-chg-krw').textContent = '';
+
+  // 새 손익 (새 평균단가 카드 내부)
+  const newPlEl = document.getElementById('sim-new-pl');
+  const newPlSign = newPl >= 0 ? '+' : '-';
+  newPlEl.textContent = newPlSign + c.fmt(Math.abs(newPl));
+  newPlEl.style.color = newPl >= 0 ? 'var(--pos)' : 'var(--neg)';
+  const plRateStr = (newPl>=0?'+':'')+newPlRate.toFixed(2)+'%';
+  const plRateEl = document.getElementById('sim-new-pl-rate');
+  plRateEl.textContent = plRateStr + ' · ' + (newPl>=0?'수익 중':'손실 중');
+  plRateEl.style.color = newPl >= 0 ? 'var(--pos)' : 'var(--neg)';
+  const krwNewPl = toKrwTag(Math.abs(newPl));
+  const newPlKrwEl = document.getElementById('sim-new-pl-krw');
+  newPlKrwEl.textContent = krwNewPl ? (newPl>=0?'≈ +':'≈ -')+krwNewPl.replace('≈ ','') : '';
+  newPlKrwEl.style.color = newPl >= 0 ? 'var(--pos)' : 'var(--neg)';
+  newPlKrwEl.style.opacity = '0.8';
+
+  // Row 2: 투자원금 / 추가 투자금 / 총 투자금
+  document.getElementById('sim-orig-cost').textContent = c.fmt(origCost);
+  const krwOrig = toKrwTag(origCost);
+  document.getElementById('sim-orig-cost-krw').textContent = krwOrig || '';
+  document.getElementById('sim-orig-cost-krw').style.color = 'var(--text3)';
+
+  document.getElementById('sim-add-cost').textContent = c.fmt(addCost);
+  const krwAdd = toKrwTag(addCost);
+  document.getElementById('sim-add-cost-krw').textContent = krwAdd || '';
+  document.getElementById('sim-add-cost-krw').style.color = 'var(--text3)';
+
+  document.getElementById('sim-total-cost').textContent = c.fmt(totalCost);
+  const krwTotal = toKrwTag(totalCost);
+  document.getElementById('sim-total-cost-krw').textContent = krwTotal || '';
+  document.getElementById('sim-total-cost-krw').style.color = 'var(--text3)';
+}
+
+// Listen to HOLD inputs for live update
+['hold_price','hold_qty','current_price'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', ()=>{
+    // current_price → sim-cur-price 동기화
+    if (id === 'current_price') {
+      const simCp = document.getElementById('sim-cur-price');
+      if (simCp && simCp !== document.activeElement)
+        simCp.value = document.getElementById('current_price').value;
+    }
+    updateQuickPanel();
+    saveCurrentInputsToTab(state.active);
+    saveData(state);
+  });
+});
+
+// sim-cur-price → current_price 역방향 동기화
+document.getElementById('sim-cur-price')?.addEventListener('input', function() {
+  const mainCp = document.getElementById('current_price');
+  mainCp.value = this.value;
+  updateQuickPanel();
+  saveCurrentInputsToTab(state.active);
+  saveData(state);
+});
+
+// ── Stepper ────────────────────────────────────────────────────
+const simQtyEl = document.getElementById('sim-qty');
+
+function refreshSim() {
+  const hp = parseFloat(document.getElementById('hold_price').value);
+  const hq = parseFloat(document.getElementById('hold_qty').value);
+  const cp = parseFloat(document.getElementById('current_price').value)||null;
+  if(hp&&hq&&cp) updateSimulator(hp,hq,cp);
+}
+
+simQtyEl.addEventListener('input', refreshSim);
+
+// Tap step buttons
+let stepInterval=null, stepTimeout=null;
+
+function startStep(dir) {
+  doStep(dir);
+  stepTimeout = setTimeout(()=>{
+    stepInterval = setInterval(()=>doStep(dir), 80);
+  }, 400);
+}
+function stopStep() {
+  clearTimeout(stepTimeout); clearInterval(stepInterval);
+}
+function doStep(dir) {
+  let v = parseInt(simQtyEl.value)||1;
+  v = Math.max(1, v+dir);
+  simQtyEl.value = v;
+  refreshSim();
+}
+
+['mousedown','touchstart'].forEach(ev=>{
+  document.getElementById('step-minus').addEventListener(ev,e=>{e.preventDefault();startStep(-1);});
+  document.getElementById('step-plus').addEventListener(ev,e=>{e.preventDefault();startStep(1);});
+});
+['mouseup','touchend','mouseleave'].forEach(ev=>{
+  document.getElementById('step-minus').addEventListener(ev,stopStep);
+  document.getElementById('step-plus').addEventListener(ev,stopStep);
+});
+
+// ── Add Row ────────────────────────────────────────────────────
+let rowCount=1;
+document.getElementById('add-row-btn').addEventListener('click',()=>addRowWith('',''));
+
+function addRowWith(pv,qv) {
+  rowCount++;
+  const c=CUR[currency];
+  const wrap=document.createElement('div');
+  wrap.className='extra-row';
+  wrap.innerHTML=`
+    <div class="field"><label>매수가 #${rowCount}</label>
+      <div class="input-wrap"><input type="number" class="buy-price" placeholder="${c.ph_buy}" inputmode="decimal" value="${pv}"><span class="unit price-unit">${c.unit}</span></div>
+    </div>
+    <div class="field"><label>수량</label>
+      <div class="input-wrap"><input type="number" class="buy-qty" placeholder="50" inputmode="decimal" value="${qv}"><span class="unit">주</span></div>
+    </div>
+    <button class="del-btn" onclick="this.parentElement.remove()">✕</button>`;
+  document.getElementById('add-row-btn').parentElement.before(wrap);
+}
+
+// ── Calculate (detailed) ───────────────────────────────────────
+const fmtN = n=>n.toLocaleString('ko-KR')+'주';
+const pct  = n=>(n>=0?'+':'')+n.toFixed(2)+'%';
 
 document.getElementById('calc-btn').addEventListener('click', calculate);
 
 function calculate() {
-  const c = CUR[currency];
-  const holdPrice = parseFloat(document.getElementById('hold_price').value);
-  const holdQty   = parseFloat(document.getElementById('hold_qty').value);
-  const curPrice  = parseFloat(document.getElementById('current_price').value)||null;
+  const c=CUR[currency];
+  const hp=parseFloat(document.getElementById('hold_price').value);
+  const hq=parseFloat(document.getElementById('hold_qty').value);
+  const cp=parseFloat(document.getElementById('current_price').value)||null;
+  if(!hp||!hq||hp<=0||hq<=0){shake(document.getElementById('section-hold'));return;}
 
-  if (!holdPrice||!holdQty||holdPrice<=0||holdQty<=0) {
-    shake(document.getElementById('section-hold')); return;
-  }
-
-  let addedCost=0, addedQty=0;
-  const bPrices = document.querySelectorAll('.buy-price');
-  const bQtys   = document.querySelectorAll('.buy-qty');
-  bPrices.forEach((el,i)=>{
-    const p=parseFloat(el.value), q=parseFloat(bQtys[i]?.value);
+  let addedCost=0,addedQty=0;
+  document.querySelectorAll('.buy-price').forEach((el,i)=>{
+    const p=parseFloat(el.value),q=parseFloat(document.querySelectorAll('.buy-qty')[i]?.value);
     if(p>0&&q>0){addedCost+=p*q;addedQty+=q;}
   });
 
-  const totalQty  = holdQty+addedQty;
-  const totalCost = holdPrice*holdQty+addedCost;
-  const newAvg    = totalCost/totalQty;
-  const evalAmt   = curPrice?curPrice*totalQty:null;
-  const pl        = evalAmt!==null?evalAmt-totalCost:null;
-  const plRate    = pl!==null?(pl/totalCost)*100:null;
-  const avgChg    = ((newAvg-holdPrice)/holdPrice)*100;
-  const recRate   = curPrice?((newAvg-curPrice)/curPrice)*100:null;
-  const lossRate  = curPrice?((curPrice-holdPrice)/holdPrice)*100:null;
+  const totalQty=hq+addedQty;
+  const totalCost=hp*hq+addedCost;
+  const newAvg=totalCost/totalQty;
+  const evalAmt=cp?cp*totalQty:null;
+  const pl=evalAmt!==null?evalAmt-totalCost:null;
+  const plRate=pl!==null?(pl/totalCost)*100:null;
+  const avgChg=((newAvg-hp)/hp)*100;
+  const recRate=cp?((newAvg-cp)/cp)*100:null;
+  const lossRate=cp?((cp-hp)/hp)*100:null;
 
-  // Save to cookie
-  saveCurrentInputsToTab(state.active);
-  saveCookie(state);
+  saveCurrentInputsToTab(state.active); saveData(state);
 
-  // Results
-  document.getElementById('res-avg').textContent = c.fmt(newAvg);
-  document.getElementById('res-avg-change').textContent = '기존 평단 대비 '+pct(avgChg);
-  document.getElementById('res-total-qty').textContent = fmtN(totalQty);
-  document.getElementById('res-qty-add').textContent = addedQty>0?`+${addedQty.toLocaleString()}주 추가`:'추가 없음';
-  document.getElementById('res-total-invest').textContent = c.fmt(totalCost);
+  document.getElementById('res-avg').textContent=c.fmt(newAvg);
+  document.getElementById('res-avg-change').textContent='기존 평단 대비 '+pct(avgChg);
+  document.getElementById('res-total-qty').textContent=fmtN(totalQty);
+  document.getElementById('res-qty-add').textContent=addedQty>0?`+${addedQty.toLocaleString()}주 추가`:'추가 없음';
+  document.getElementById('res-total-invest').textContent=c.fmt(totalCost);
 
-  if (evalAmt!==null) {
-    document.getElementById('res-eval').textContent = c.fmt(evalAmt);
-    const plEl = document.getElementById('res-pl');
-    plEl.textContent = (pl>=0?'▲ ':'▼ ')+c.fmtD(pl)+' ('+pct(plRate)+')';
-    plEl.style.color = pl>=0?(currency==='usd'?'var(--accent-usd)':'var(--accent)'):'var(--accent2)';
-    document.getElementById('res-eval').className = 'result-value '+(pl>=0?'accent':'red');
-    const ratio = Math.min(Math.max((curPrice/newAvg)*50,0),100);
-    document.getElementById('rate-bar').style.width = ratio+'%';
-    document.getElementById('rate-text').textContent = curPrice>=newAvg?'📈 평단가 위 (수익 구간)':'📉 평단가 아래 (손실 구간)';
-    document.getElementById('rate-text').style.color = curPrice>=newAvg?(currency==='usd'?'var(--accent-usd)':'var(--accent)'):'var(--accent2)';
+  if(evalAmt!==null){
+    document.getElementById('res-eval').textContent=c.fmt(evalAmt);
+    const plEl=document.getElementById('res-pl');
+    plEl.textContent=(pl>=0?'▲ ':'▼ ')+c.fmtD(pl)+' ('+pct(plRate)+')';
+    plEl.style.color=pl>=0?(currency==='usd'?'var(--accent-usd)':'var(--accent)'):'var(--accent2)';
+    document.getElementById('res-eval').className='result-value '+(pl>=0?'accent':'red');
+    const ratio=Math.min(Math.max((cp/newAvg)*50,0),100);
+    document.getElementById('rate-bar').style.width=ratio+'%';
+    document.getElementById('rate-text').textContent=cp>=newAvg?'📈 평단가 위 (수익 구간)':'📉 평단가 아래 (손실 구간)';
+    document.getElementById('rate-text').style.color=cp>=newAvg?(currency==='usd'?'var(--accent-usd)':'var(--accent)'):'var(--accent2)';
   } else {
-    document.getElementById('res-eval').textContent = '—';
-    document.getElementById('res-pl').textContent = '현재가 입력 시 표시';
-    document.getElementById('rate-bar').style.width = '50%';
-    document.getElementById('rate-text').textContent = '';
+    document.getElementById('res-eval').textContent='—';
+    document.getElementById('res-pl').textContent='현재가 입력 시 표시';
+    document.getElementById('rate-bar').style.width='50%';
+    document.getElementById('rate-text').textContent='';
   }
 
-  document.getElementById('be-breakeven').textContent = c.fmt(newAvg);
-  document.getElementById('be-recover').textContent = recRate!==null?pct(Math.abs(recRate))+' 상승 필요':'현재가 입력 필요';
-  document.getElementById('be-loss').textContent = lossRate!==null?pct(lossRate):'현재가 입력 필요';
-  document.getElementById('be-added').textContent = addedQty>0?c.fmt(addedCost):'추가 매수 없음';
+  document.getElementById('be-breakeven').textContent=c.fmt(newAvg);
+  document.getElementById('be-recover').textContent=recRate!==null?pct(Math.abs(recRate))+' 상승 필요':'현재가 입력 필요';
+  document.getElementById('be-loss').textContent=lossRate!==null?pct(lossRate):'현재가 입력 필요';
+  document.getElementById('be-added').textContent=addedQty>0?c.fmt(addedCost):'추가 매수 없음';
 
-  const rs = document.getElementById('result-section');
-  rs.classList.remove('visible'); void rs.offsetWidth;
-  rs.classList.add('visible');
-  document.getElementById('reset-wrap').style.display = 'block';
+  const rs=document.getElementById('result-section');
+  rs.classList.remove('visible');void rs.offsetWidth;rs.classList.add('visible');
+  document.getElementById('reset-wrap').style.display='block';
   setTimeout(()=>rs.scrollIntoView({behavior:'smooth',block:'start'}),100);
 }
 
-// ── Reset ───────────────────────────────────────────────────────
+// ── Reset ──────────────────────────────────────────────────────
 document.getElementById('reset-btn').addEventListener('click',()=>{
   document.querySelectorAll('input').forEach(i=>i.value='');
+  document.getElementById('sim-qty').value='1';
   document.querySelectorAll('.extra-row').forEach(r=>r.remove());
   rowCount=1;
-  saveCurrentInputsToTab(state.active);
-  saveCookie(state);
-  hideResult();
+  saveCurrentInputsToTab(state.active); saveData(state);
+  hideResult(); updateQuickPanel();
   window.scrollTo({top:0,behavior:'smooth'});
 });
 
-function hideResult() {
+function hideResult(){
   document.getElementById('result-section').classList.remove('visible');
   document.getElementById('reset-wrap').style.display='none';
 }
 
-// ── Modal ────────────────────────────────────────────────────────
-function showModal(title, msg, btns) {
-  document.getElementById('modal-title').textContent = title;
-  document.getElementById('modal-msg').textContent = msg;
-  const bc = document.getElementById('modal-btns');
-  bc.innerHTML = '';
-  btns.forEach(b => {
-    const el = document.createElement('button');
-    el.className = 'modal-btn '+b.cls;
-    el.textContent = b.label;
-    el.addEventListener('click', b.cb);
-    bc.appendChild(el);
-  });
+// ── Modal ──────────────────────────────────────────────────────
+function showModal(title,msg,btns){
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-msg').textContent=msg;
+  const bc=document.getElementById('modal-btns'); bc.innerHTML='';
+  btns.forEach(b=>{const el=document.createElement('button');el.className='modal-btn '+b.cls;el.textContent=b.label;el.addEventListener('click',b.cb);bc.appendChild(el);});
   document.getElementById('modal').classList.add('show');
 }
-function closeModal() {
-  document.getElementById('modal').classList.remove('show');
-}
-document.getElementById('modal').addEventListener('click', e => {
-  if (e.target === document.getElementById('modal')) closeModal();
-});
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
 
-// ── Shake ────────────────────────────────────────────────────────
-function shake(el) {
-  const frames=[0,-8,8,-6,6,-3,3,0]; let i=0;
+// ── Shake ──────────────────────────────────────────────────────
+function shake(el){
+  const f=[0,-8,8,-6,6,-3,3,0];let i=0;
   el.style.transition='transform 0.05s';
-  const t=setInterval(()=>{
-    el.style.transform=`translateX(${frames[i++]}px)`;
-    if(i>=frames.length){clearInterval(t);el.style.transform='';}
-  },40);
+  const t=setInterval(()=>{el.style.transform=`translateX(${f[i++]}px)`;if(i>=f.length){clearInterval(t);el.style.transform='';}},40);
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Enter')calculate();});
 
-// ── Init ─────────────────────────────────────────────────────────
+
+// ── Chart ──────────────────────────────────────────────────────
+let chartCursorPct = 0.001; // 첫 렌더 시 스냅 → 1주
+let chartZoom = 32;          // 기본 32x
+const CHART_ZOOM_MAX = 128;
+
+function getChartBaseMax(hp) {
+  if (currency === 'krw') return hp < 1000000 ? 10000000 : 100000000;
+  return hp < 100 ? 10000 : hp < 1000 ? 100000 : 1000000;
+}
+function getChartMaxX(hp) { return getChartBaseMax(hp) / chartZoom; }
+
+function fmtXLabel(x, maxX) {
+  if (currency === 'krw') {
+    if (x === 0) return '0';
+    if (x >= 100000000) return (x/100000000).toFixed(x%100000000===0?0:1)+'억';
+    if (x >= 10000)     return Math.round(x/10000)+'만원';
+    return x.toLocaleString('ko-KR')+'원';
+  } else {
+    if (x === 0) return '$0';
+    if (x >= 1000000) return '$'+(x/1000000).toFixed(1)+'M';
+    if (x >= 1000)    return '$'+Math.round(x/1000)+'K';
+    return '$'+x.toFixed(0);
+  }
+}
+
+function fmtInvLabel(x, maxX) {
+  // 툴팁용: 더 친절한 표현
+  if (currency === 'krw') {
+    if (x === 0) return '현재 상태';
+    if (x >= 100000000) return (x/100000000).toFixed(1)+'억원 추가 투자 시';
+    return Math.round(x/10000)+'만원 추가 투자 시';
+  } else {
+    if (x === 0) return '현재 상태';
+    if (x >= 1000000) return '$'+(x/1000000).toFixed(2)+'M 추가 투자 시';
+    if (x >= 1000)    return '$'+Math.round(x/1000)+'K 추가 투자 시';
+    return '$'+x.toFixed(0)+' 추가 투자 시';
+  }
+}
+
+function updateZoomLabel() {
+  const el = document.getElementById('chart-zoom-label');
+  if (el) el.textContent = chartZoom + '×';
+}
+
+function rrect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+}
+
+function drawChart(holdPrice, holdQty, curPrice) {
+  const canvas = document.getElementById('avg-chart');
+  if (!canvas || !holdPrice || !holdQty || !curPrice) return;
+  const dpr  = window.devicePixelRatio || 1;
+  const cssW = canvas.parentElement.clientWidth - 2;
+  const cssH = 196;
+  canvas.style.width  = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  canvas.width  = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const PAD  = { t:14, r:14, b:32, l: currency==='krw' ? 74 : 62 };
+  const W = cssW - PAD.l - PAD.r;
+  const H = cssH - PAD.t - PAD.b;
+
+  const maxX = getChartMaxX(holdPrice);
+  const N    = 150;
+  const pts  = [];
+  for (let i = 0; i <= N; i++) {
+    const x  = (i / N) * maxX;
+    const aq = curPrice > 0 ? x / curPrice : 0;
+    const avg = (holdPrice * holdQty + x) / (holdQty + aq);
+    pts.push({ x, avg, qty: holdQty + aq });
+  }
+
+  const spread = pts[0].avg - pts[N].avg;
+  const lo = pts[N].avg - spread * 0.06;
+  const hi = pts[0].avg + spread * 0.10;
+
+  const px = x => PAD.l + (x / maxX) * W;
+  const py = a => PAD.t + (1 - (a - lo) / (hi - lo)) * H;
+
+  ctx.clearRect(0, 0, cssW, cssH);
+
+  // Y grid + labels
+  for (let i = 0; i <= 4; i++) {
+    const a = lo + (i/4) * (hi - lo);
+    const y = py(a);
+    ctx.strokeStyle='#1e1e2e'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+W,y); ctx.stroke();
+    ctx.fillStyle='#4a5070'; ctx.font='10px Space Mono,monospace';
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    const lbl = currency==='krw'
+      ? Math.round(a).toLocaleString('ko-KR')
+      : '$'+a.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
+    ctx.fillText(lbl, PAD.l-5, y);
+  }
+
+  // ── 주 단위 계산 ──────────────────────────────────────────
+  const maxAddShares = curPrice > 0 ? Math.floor(maxX / curPrice) : 0;
+
+  // 점 표시 간격: 화면에 최대 20개 점
+  const niceSteps = [1,2,3,5,10,15,20,25,50,100,200,500,1000,2000,5000];
+  const dotStep   = niceSteps.find(s => Math.floor(maxAddShares/s) <= 20) || 1;
+  // 라벨 간격: 3~5개 목표
+  const lblStep   = niceSteps.find(s => {
+    const cnt = Math.floor(maxAddShares/s);
+    return cnt >= 2 && cnt <= 5;
+  }) || niceSteps.find(s => Math.floor(maxAddShares/s) <= 5) || dotStep;
+
+  // X grid ticks (점 위치마다 얇은 세로선)
+  if (maxAddShares > 0 && maxAddShares <= 200) {
+    ctx.strokeStyle='rgba(42,42,56,0.7)'; ctx.lineWidth=1;
+    for (let n = dotStep; n <= maxAddShares; n += dotStep) {
+      const gx = px(n * curPrice);
+      ctx.beginPath(); ctx.moveTo(gx, PAD.t); ctx.lineTo(gx, PAD.t+H); ctx.stroke();
+    }
+  }
+
+  // X labels: 주 단위
+  ctx.fillStyle='#4a5070'; ctx.font='11px Space Mono,monospace';
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  if (maxAddShares > 0) {
+    // 0주 (시작)
+    ctx.fillText('0주', px(0), PAD.t+H+5);
+    for (let n = lblStep; n <= maxAddShares; n += lblStep) {
+      ctx.fillText(n+'주', px(n * curPrice), PAD.t+H+5);
+    }
+  } else {
+    // fallback
+    for (let i=0;i<=5;i++) ctx.fillText(fmtXLabel((i/5)*maxX,maxX), px((i/5)*maxX), PAD.t+H+5);
+  }
+
+  // Curve fill
+  const grad = ctx.createLinearGradient(0, PAD.t, 0, PAD.t+H);
+  grad.addColorStop(0, 'rgba(96,165,250,0.16)');
+  grad.addColorStop(1, 'rgba(96,165,250,0.01)');
+  ctx.beginPath();
+  pts.forEach((p,i) => i===0 ? ctx.moveTo(px(p.x),py(p.avg)) : ctx.lineTo(px(p.x),py(p.avg)));
+  ctx.lineTo(px(maxX), py(lo)); ctx.lineTo(px(0), py(lo));
+  ctx.fillStyle=grad; ctx.fill();
+
+  // Curve line
+  ctx.beginPath();
+  ctx.strokeStyle='#60a5fa'; ctx.lineWidth=2.5; ctx.lineJoin='round';
+  pts.forEach((p,i) => i===0 ? ctx.moveTo(px(p.x),py(p.avg)) : ctx.lineTo(px(p.x),py(p.avg)));
+  ctx.stroke();
+
+  // 곡선 위 주 단위 점
+  if (maxAddShares > 0 && maxAddShares <= 200) {
+    for (let n = dotStep; n <= maxAddShares; n += dotStep) {
+      const dX   = n * curPrice;
+      const dQty = holdQty + n;
+      const dAvg = (holdPrice * holdQty + dX) / dQty;
+      const dx   = px(dX);
+      const dy   = py(dAvg);
+      // 라벨 위치는 큰 점, 나머지는 작은 점
+      ctx.beginPath();
+      ctx.arc(dx, dy, 3.5, 0, Math.PI*2);
+      ctx.fillStyle   = '#60a5fa';
+      ctx.fill();
+      ctx.strokeStyle = '#0a0a0f';
+      ctx.lineWidth   = 1.5;
+      ctx.stroke();
+    }
+  }
+
+  // Cursor: 정수 주 단위 스냅 (최소 1주)
+  const _rawX       = chartCursorPct * maxX;
+  const _rawAddQty  = curPrice > 0 ? _rawX / curPrice : 1;
+  const snapAddQty  = Math.max(1, Math.round(_rawAddQty));   // 최소 1주
+  const snapX       = snapAddQty * curPrice;
+  const snapNewQty  = holdQty + snapAddQty;
+  const snapAvg     = (holdPrice * holdQty + snapX) / snapNewQty;
+  const curX = Math.min(px(snapX), PAD.l + W);               // 캔버스 범위 클램프
+  const curY = py(snapAvg);
+  // cp2 호환용 객체
+  const cp2 = { x: snapX, avg: snapAvg, qty: snapNewQty };
+
+  ctx.beginPath(); ctx.strokeStyle='rgba(255,209,102,0.5)';
+  ctx.lineWidth=1; ctx.setLineDash([4,3]);
+  ctx.moveTo(curX, PAD.t); ctx.lineTo(curX, PAD.t+H); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.beginPath(); ctx.arc(curX, curY, 5.5, 0, Math.PI*2);
+  ctx.fillStyle='#ffd166'; ctx.fill();
+  ctx.strokeStyle='#0a0a0f'; ctx.lineWidth=2; ctx.stroke();
+
+  // ── Tooltip ──────────────────────────────────────────────
+  const c         = CUR[currency];
+  const invLabel  = fmtInvLabel(cp2.x, maxX);
+  // 헤더: KRW 모드는 원화 투자금, USD 모드는 원화 환산값으로 대체
+  const invKrwAmt = (currency === 'usd' && usdKrw && cp2.x > 0)
+    ? Math.round(cp2.x * usdKrw).toLocaleString('ko-KR') + '원 추가 투자 시'
+    : null;
+  // KRW 모드에서 헤더는 원화 금액 직접 표시
+  const invKrwKrw = (currency === 'krw' && cp2.x > 0)
+    ? Math.round(cp2.x).toLocaleString('ko-KR') + '원 추가 투자 시'
+    : null;
+  // 실제 표시할 헤더 텍스트: KRW 금액 우선, 없으면 원본 invLabel
+  const headerLabel = invKrwAmt || invKrwKrw || invLabel;
+
+  const avgStr    = c.fmt(cp2.avg);
+  const addQty    = snapAddQty;   // 이미 정수 주 단위
+  const qtyStr    = addQty.toLocaleString('ko-KR') + '주';
+  const krwAvg    = toKrwTag(cp2.avg);  // only non-null in USD mode
+
+  // 바디 라인 — +2pt 폰트 (label 12px, val bold 13px)
+  const ttLines = [
+    { text: '추가수량',  val: qtyStr,  valColor: '#e8e8f0',   bold: false },
+    { text: '평균단가',  val: avgStr,  valColor: '#e8e8f0',   bold: true  },
+  ];
+  if (krwAvg) {
+    ttLines.push({ text: '',  val: '= '+krwAvg.replace('≈ ',''), valColor: '#9098b8', bold: false, indent: true });
+  }
+
+  const ttPad   = 10;
+  const lineH   = 22;   // +2pt 폰트에 맞게 라인 높이 증가
+  const headerH = 17;
+  const labelW  = 60;   // 라벨 컬럼 폭
+
+  ctx.font = 'bold 13px Space Mono,monospace';
+  const valMaxW = Math.max(...ttLines.map(l => {
+    ctx.font = l.bold ? 'bold 13px Space Mono,monospace' : '12px Space Mono,monospace';
+    return ctx.measureText(l.val).width;
+  }));
+  ctx.font = 'bold 13px Space Mono,monospace';
+  const headerW = ctx.measureText(headerLabel).width;
+  const ttW  = Math.max(headerW, labelW + valMaxW) + ttPad * 2 + 4;
+  const ttH  = ttPad * 2 + headerH + ttLines.length * lineH;
+
+  let ttX = curX + 12;
+  if (ttX + ttW > cssW - 4) ttX = curX - ttW - 12;
+  const ttY = PAD.t + 6;
+
+  // Box
+  ctx.fillStyle='#16161f'; ctx.strokeStyle='#35354a'; ctx.lineWidth=1;
+  rrect(ctx, ttX, ttY, ttW, ttH, 9); ctx.fill(); ctx.stroke();
+
+  // Header: KRW 금액 (노란색, bold 13px — 기존 스타일 유지)
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillStyle='#ffd166'; ctx.font='bold 13px Space Mono,monospace';
+  ctx.fillText(headerLabel, ttX+ttPad, ttY+ttPad);
+
+  // Divider line
+  const divY = ttY + ttPad + headerH + 1;
+  ctx.beginPath(); ctx.strokeStyle='#2a2a3a'; ctx.lineWidth=1;
+  ctx.moveTo(ttX+ttPad, divY); ctx.lineTo(ttX+ttW-ttPad, divY); ctx.stroke();
+
+  // Lines (+2pt: label 12px, val bold 13px)
+  ttLines.forEach((ln, i) => {
+    const y = divY + 5 + i * lineH;
+    if (ln.text) {
+      ctx.fillStyle='#5a607e'; ctx.font='12px Space Mono,monospace';
+      ctx.fillText(ln.text, ttX+ttPad+(ln.indent?14:0), y);
+    }
+    ctx.fillStyle=ln.valColor;
+    ctx.font = ln.bold ? 'bold 13px Space Mono,monospace' : '12px Space Mono,monospace';
+    const vx = ln.text ? ttX+ttPad+labelW : ttX+ttPad+(ln.indent?14:0);
+    ctx.fillText(ln.val, vx, y);
+  });
+
+  canvas._chart = { maxX, pts, PAD, W, N, cssW };
+}
+
+function setupChartInteraction() {
+  const canvas  = document.getElementById('avg-chart');
+  const btnIn   = document.getElementById('chart-zoom-in');
+  const btnOut  = document.getElementById('chart-zoom-out');
+  if (!canvas) return;
+
+  function redraw() {
+    const hp = parseFloat(document.getElementById('hold_price').value);
+    const hq = parseFloat(document.getElementById('hold_qty').value);
+    const cp = parseFloat(document.getElementById('current_price').value);
+    if (hp && hq && cp) drawChart(hp, hq, cp);
+  }
+
+  // Cursor drag
+  function moveCursor(clientX) {
+    const d = canvas._chart; if (!d) return;
+    const rect = canvas.getBoundingClientRect();
+    chartCursorPct = Math.max(0, Math.min(1, (clientX - rect.left - d.PAD.l) / d.W));
+    redraw();
+  }
+
+  // Zoom buttons
+  if (btnIn)  btnIn.addEventListener('click',  () => { if (chartZoom < CHART_ZOOM_MAX) { chartZoom *= 2; updateZoomLabel(); redraw(); } });
+  if (btnOut) btnOut.addEventListener('click', () => { if (chartZoom > 1) { chartZoom = Math.max(1, chartZoom / 2); updateZoomLabel(); redraw(); } });
+
+  // Mouse wheel zoom
+  canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    if (e.deltaY < 0) { if (chartZoom < CHART_ZOOM_MAX) chartZoom *= 2; }
+    else              { if (chartZoom > 1) chartZoom = Math.max(1, chartZoom / 2); }
+    updateZoomLabel(); redraw();
+  }, { passive: false });
+
+  // Touch: single finger = cursor move, two finger = pinch zoom
+  let lastPinchDist = null;
+  canvas.addEventListener('touchstart', e => {
+    if (e.touches.length === 1) moveCursor(e.touches[0].clientX);
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      lastPinchDist = Math.sqrt(dx*dx + dy*dy);
+    }
+  }, { passive: true });
+
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (e.touches.length === 1 && lastPinchDist === null) {
+      moveCursor(e.touches[0].clientX);
+    }
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (lastPinchDist !== null) {
+        const ratio = dist / lastPinchDist;
+        if (ratio > 1.15 && chartZoom < CHART_ZOOM_MAX) { chartZoom *= 2; updateZoomLabel(); redraw(); lastPinchDist = dist; }
+        if (ratio < 0.85 && chartZoom > 1)              { chartZoom = Math.max(1, chartZoom/2); updateZoomLabel(); redraw(); lastPinchDist = dist; }
+      }
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', e => {
+    if (e.touches.length < 2) lastPinchDist = null;
+  });
+
+  canvas.addEventListener('mousemove', e => moveCursor(e.clientX));
+}
+
+// ── Init ───────────────────────────────────────────────────────
 initState();
+updateZoomLabel(); // 초기 라벨 동기화
+// Fetch rate if last currency was USD
+if(currency==='usd') fetchExchangeRate();
+setupChartInteraction();
 </script>
 </body>
 </html>
