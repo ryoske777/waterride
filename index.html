@@ -943,7 +943,7 @@ function updateQuickPanel() {
 
   updateFxBadge();
   updateSimulator(hp, hq, cp);
-  drawChart(hp, hq, cp);
+  drawChartDebounced(hp, hq, cp); // 차트만 디바운스 (150ms)
 }
 
 // ── Simulator ─────────────────────────────────────────────────
@@ -1204,6 +1204,14 @@ document.addEventListener('keydown',e=>{if(e.key==='Enter')calculate();});
 
 // ── Chart ──────────────────────────────────────────────────────
 let chartCursorPct = 0.001; // 첫 렌더 시 스냅 → 1주
+let chartDebounceTimer = null;
+
+function drawChartDebounced(hp, hq, cp) {
+  clearTimeout(chartDebounceTimer);
+  chartDebounceTimer = setTimeout(() => {
+    requestAnimationFrame(() => drawChart(hp, hq, cp));
+  }, 150);
+}
 let chartZoom = 32;          // 기본 32x
 const CHART_ZOOM_MAX = 128;
 
