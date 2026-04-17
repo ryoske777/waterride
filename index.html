@@ -1169,6 +1169,7 @@ function updateSimulator(holdPrice, holdQty, curPrice) {
 
 // Listen to HOLD inputs for live update
 let holdSaveTimer = null;
+let holdUpdatePending = false;
 ['hold_price','hold_qty','current_price'].forEach(id=>{
   document.getElementById(id).addEventListener('input', ()=>{
     if (id === 'current_price') {
@@ -1176,7 +1177,10 @@ let holdSaveTimer = null;
       if (simCp && simCp !== document.activeElement)
         simCp.value = fmtComma(stripComma(document.getElementById('current_price').value));
     }
-    updateQuickPanel();
+    if (!holdUpdatePending) {
+      holdUpdatePending = true;
+      requestAnimationFrame(()=>{ holdUpdatePending=false; updateQuickPanel(); });
+    }
     clearTimeout(holdSaveTimer);
     holdSaveTimer = setTimeout(()=>{ saveCurrentInputsToTab(state.active); saveData(state); }, 400);
   });
@@ -1186,7 +1190,10 @@ let holdSaveTimer = null;
 document.getElementById('sim-cur-price')?.addEventListener('input', function() {
   const mainCp = document.getElementById('current_price');
   mainCp.value = fmtComma(stripComma(this.value));
-  updateQuickPanel();
+  if (!holdUpdatePending) {
+    holdUpdatePending = true;
+    requestAnimationFrame(()=>{ holdUpdatePending=false; updateQuickPanel(); });
+  }
   clearTimeout(holdSaveTimer);
   holdSaveTimer = setTimeout(()=>{ saveCurrentInputsToTab(state.active); saveData(state); }, 400);
 });
