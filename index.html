@@ -250,6 +250,9 @@
     body.usd .modal-btn.primary { background: var(--accent-usd); }
     .modal-btn.secondary { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
     .modal-btn.danger { background: var(--accent2); color: #fff; }
+    .modal-input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 11px; padding: 10px 13px; font-size: 15px; color: var(--text); font-family: 'Noto Sans KR', sans-serif; margin-bottom: 16px; outline: none; box-sizing: border-box; transition: border-color 0.15s; }
+    .modal-input:focus { border-color: var(--accent); }
+    body.usd .modal-input:focus { border-color: var(--accent-usd); }
 
 
     /* ── Chart ── */
@@ -732,6 +735,7 @@
   <div class="modal-box">
     <div class="modal-title" id="modal-title"></div>
     <div class="modal-msg" id="modal-msg"></div>
+    <input type="text" id="modal-input" class="modal-input" style="display:none">
     <div class="modal-btns" id="modal-btns"></div>
   </div>
 </div>
@@ -837,6 +841,8 @@ function initState() {
 }
 
 // ── Tabs ───────────────────────────────────────────────────────
+let tabDragMoved = false;
+
 function renderTabs() {
   const scroll = document.getElementById('tab-scroll');
   scroll.innerHTML = '';
@@ -844,13 +850,26 @@ function renderTabs() {
     const btn = document.createElement('button');
     btn.className = 'tab-btn'+(i===state.active?' active':'');
     btn.textContent = t.label;
-    btn.addEventListener('click', ()=>switchTab(i));
+    btn.addEventListener('click', ()=>{ if(!tabDragMoved) switchTab(i); });
+    btn.addEventListener('dblclick', e=>{ e.preventDefault(); renameTab(i); });
+    let lastTap=0;
+    btn.addEventListener('touchend', e=>{
+      const now=Date.now();
+      if(now-lastTap<300){ e.preventDefault(); renameTab(i); }
+      lastTap=now;
+    });
     scroll.appendChild(btn);
   });
   setTimeout(()=>{
     const a = scroll.querySelector('.tab-btn.active');
     if(a) a.scrollIntoView({behavior:'smooth',block:'nearest',inline:'nearest'});
   },50);
+}
+
+function renameTab(idx){
+  showPromptModal('탭 이름 변경', state.tabs[idx].label, name=>{
+    if(name!==null){ state.tabs[idx].label=name; saveData(state); renderTabs(); }
+  });
 }
 
 function switchTab(idx) {
@@ -893,22 +912,16 @@ function loadTab(idx) {
 }
 
 document.getElementById('tab-add-btn').addEventListener('click',()=>{
-  if(state.tabs.length>=5){
-    showModal('탭 최대치 도달','최대 5개까지 사용 가능합니다.\n기존 탭을 삭제 후 추가해 주세요.',[{label:'확인',cls:'primary',cb:closeModal}]);return;
+  if(state.tabs.length>=20){
+    showModal('탭 최대치 도달','최대 20개까지 사용 가능합니다.\n기존 탭을 삭제 후 추가해 주세요.',[{label:'확인',cls:'primary',cb:closeModal}]);return;
   }
-  const today = getToday();
-  const dup = state.tabs.filter(t=>t.label===today||t.label.startsWith(today+'(')).length;
-  if(dup>0){
-    showModal('오늘 날짜가 이미 존재합니다',`${today} 탭이 이미 있습니다.\n추가로 생성하시겠습니까?`,[
-      {label:'추가 생성',cls:'primary',cb:()=>{closeModal();createTab(today,dup);}},
-      {label:'아니요',cls:'secondary',cb:closeModal},
-    ]);
-  } else { createTab(today,0); }
+  showPromptModal('새 탭 이름을 입력해 주세요.', getToday(), name=>{
+    if(name!==null) createTab(name);
+  });
 });
 
-function createTab(base,dupCount) {
+function createTab(label) {
   saveCurrentInputsToTab(state.active);
-  const label = dupCount>0?`${base}(${dupCount})`:base;
   state.tabs.push(newTab(label,currency));
   state.active = state.tabs.length-1;
   saveData(state);
@@ -1294,11 +1307,28 @@ function hideResult(){
 function showModal(title,msg,btns){
   document.getElementById('modal-title').textContent=title;
   document.getElementById('modal-msg').textContent=msg;
+  document.getElementById('modal-input').style.display='none';
   const bc=document.getElementById('modal-btns'); bc.innerHTML='';
   btns.forEach(b=>{const el=document.createElement('button');el.className='modal-btn '+b.cls;el.textContent=b.label;el.addEventListener('click',b.cb);bc.appendChild(el);});
   document.getElementById('modal').classList.add('show');
 }
-function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+function showPromptModal(title, placeholder, cb){
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-msg').textContent='';
+  const inp=document.getElementById('modal-input');
+  inp.style.display='block'; inp.value=''; inp.placeholder=placeholder;
+  const bc=document.getElementById('modal-btns'); bc.innerHTML='';
+  const confirm=()=>{ closeModal(); cb(inp.value.trim()||placeholder); };
+  const cancel=()=>{ closeModal(); cb(null); };
+  [{label:'확인',cls:'primary',cb:confirm},{label:'취소',cls:'secondary',cb:cancel}].forEach(b=>{
+    const el=document.createElement('button');el.className='modal-btn '+b.cls;el.textContent=b.label;el.addEventListener('click',b.cb);bc.appendChild(el);
+  });
+  function onKey(e){ if(e.key==='Enter'){inp.removeEventListener('keydown',onKey);confirm();}else if(e.key==='Escape'){inp.removeEventListener('keydown',onKey);cancel();} }
+  inp.addEventListener('keydown',onKey);
+  document.getElementById('modal').classList.add('show');
+  setTimeout(()=>inp.focus(),80);
+}
+function closeModal(){ document.getElementById('modal').classList.remove('show'); document.getElementById('modal-input').style.display='none'; }
 document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
 
 // ── Shake ──────────────────────────────────────────────────────
@@ -1739,6 +1769,29 @@ setupChartInteraction();
 document.querySelectorAll('#hold_price,#hold_qty,#current_price,.buy-price,.buy-qty').forEach(el=>{
   el.addEventListener('wheel',()=>el.blur());
 });
+
+// ── Tab bar drag-to-scroll (PC) ────────────────────────────────
+(()=>{
+  const scroll=document.getElementById('tab-scroll');
+  let startX,scrollLeft0;
+  scroll.addEventListener('mousedown',e=>{
+    tabDragMoved=false; startX=e.pageX; scrollLeft0=scroll.scrollLeft;
+    scroll.style.cursor='grabbing';
+    const onMove=e=>{
+      const dx=e.pageX-startX;
+      if(Math.abs(dx)>4) tabDragMoved=true;
+      scroll.scrollLeft=scrollLeft0-dx;
+    };
+    const onUp=()=>{
+      scroll.style.cursor='';
+      document.removeEventListener('mousemove',onMove);
+      document.removeEventListener('mouseup',onUp);
+      setTimeout(()=>{ tabDragMoved=false; },50);
+    };
+    document.addEventListener('mousemove',onMove);
+    document.addEventListener('mouseup',onUp);
+  });
+})();
 </script>
 </body>
 </html>
