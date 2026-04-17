@@ -499,7 +499,7 @@
 </div>
 
 <!-- 추가 매수 (상세) -->
-<div class="section">
+<div class="section" id="buy-section" style="display:none">
   <div class="section-header">
     <span class="section-badge badge-buy">BUY</span>
     <span class="section-title">추가 매수 상세 계산</span>
@@ -527,7 +527,7 @@
   </div>
 </div>
 
-<div class="calc-wrap">
+<div class="calc-wrap" id="calc-wrap-el" style="display:none">
   <button class="calc-btn" id="calc-btn">계산하기</button>
 </div>
 
@@ -817,14 +817,20 @@ function updateQuickPanel() {
   const cp  = parseFloat(document.getElementById('current_price').value)||null;
   const panel = document.getElementById('quick-panel');
 
-  const chartEl = document.getElementById('chart-section');
+  const chartEl  = document.getElementById('chart-section');
+  const buyEl    = document.getElementById('buy-section');
+  const calcWrap = document.getElementById('calc-wrap-el');
   if(!hp||!hq||hp<=0||hq<=0||!cp) {
     panel.classList.remove('show');
-    if(chartEl) chartEl.style.display='none';
+    if(chartEl)  chartEl.style.display='none';
+    if(buyEl)    buyEl.style.display='none';
+    if(calcWrap) calcWrap.style.display='none';
     return;
   }
   panel.classList.add('show');
-  if(chartEl) chartEl.style.display='block';
+  if(chartEl)  chartEl.style.display='block';
+  if(buyEl)    buyEl.style.display='block';
+  if(calcWrap) calcWrap.style.display='block';
 
   const c = CUR[currency];
   const cost   = hp*hq;
