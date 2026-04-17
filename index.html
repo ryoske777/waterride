@@ -592,32 +592,12 @@
 
 <script>
 // ── Service Worker ─────────────────────────────────────────────
+// 기존에 등록된 서비스 워커가 있으면 모두 해제 + 캐시 삭제
 if ('serviceWorker' in navigator) {
-  const sw = `
-    const CACHE = 'sv5';
-    const OLD   = ['sv4','sv3','sv2','sv1'];
-    self.addEventListener('install', e => {
-      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./','./index.html'])));
-      self.skipWaiting();
-    });
-    self.addEventListener('activate', e => {
-      e.waitUntil(
-        caches.keys().then(keys =>
-          Promise.all(keys.filter(k => OLD.includes(k)).map(k => caches.delete(k)))
-        ).then(() => self.clients.claim())
-      );
-    });
-    self.addEventListener('fetch', e => {
-      e.respondWith(
-        fetch(e.request).then(res => {
-          const clone = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
-          return res;
-        }).catch(() => caches.match(e.request))
-      );
-    });
-  `;
-  navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(r => r.unregister());
+  });
+  caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
 }
 
 // ── Storage ────────────────────────────────────────────────────
