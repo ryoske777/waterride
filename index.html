@@ -1669,9 +1669,9 @@ function setupChartInteraction() {
   if (!canvas) return;
 
   function redraw() {
-    const hp = parseFloat(document.getElementById('hold_price').value);
-    const hq = parseFloat(document.getElementById('hold_qty').value);
-    const cp = parseFloat(document.getElementById('current_price').value);
+    const hp = parseFloat(stripComma(document.getElementById('hold_price').value));
+    const hq = parseFloat(stripComma(document.getElementById('hold_qty').value));
+    const cp = parseFloat(stripComma(document.getElementById('current_price').value));
     if (hp && hq && cp) drawChart(hp, hq, cp);
   }
 
