@@ -409,14 +409,14 @@
       <div class="field">
         <label>평균 매수가</label>
         <div class="input-wrap">
-          <input type="number" id="hold_price" placeholder="50000" inputmode="decimal">
+          <input type="text" id="hold_price" placeholder="50,000" inputmode="decimal">
           <span class="unit price-unit">원</span>
         </div>
       </div>
       <div class="field">
         <label>보유 수량</label>
         <div class="input-wrap">
-          <input type="number" id="hold_qty" placeholder="100" inputmode="decimal">
+          <input type="text" id="hold_qty" placeholder="100" inputmode="numeric">
           <span class="unit">주</span>
         </div>
       </div>
@@ -424,7 +424,7 @@
     <div class="field">
       <label>현재 주가</label>
       <div class="input-wrap">
-        <input type="number" id="current_price" placeholder="42000" inputmode="decimal">
+        <input type="text" id="current_price" placeholder="42,000" inputmode="decimal">
         <span class="unit price-unit">원</span>
       </div>
     </div>
@@ -658,14 +658,14 @@
       <div class="field">
         <label>매수가</label>
         <div class="input-wrap">
-          <input type="number" class="buy-price" placeholder="40000" inputmode="decimal">
+          <input type="text" class="buy-price" placeholder="40,000" inputmode="decimal">
           <span class="unit price-unit">원</span>
         </div>
       </div>
       <div class="field">
         <label>수량</label>
         <div class="input-wrap">
-          <input type="number" class="buy-qty" placeholder="50" inputmode="decimal">
+          <input type="text" class="buy-qty" placeholder="50" inputmode="numeric">
           <span class="unit">주</span>
         </div>
       </div>
@@ -757,7 +757,7 @@ function loadData() { try { const r=localStorage.getItem('stockAvg_v4'); return 
 // ── Currency ───────────────────────────────────────────────────
 const CUR = {
   krw: {
-    unit:'원', ph_price:'50000', ph_buy:'40000', ph_cur:'42000',
+    unit:'원', ph_price:'50,000', ph_buy:'40,000', ph_cur:'42,000',
     fmt:  n => Math.round(n).toLocaleString('ko-KR')+'원',
     fmtD: n => (n>=0?'+':'')+Math.round(n).toLocaleString('ko-KR')+'원',
     fmtS: n => (n>=0?'$+':'$')+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),
@@ -771,6 +771,37 @@ const CUR = {
   },
 };
 let currency = 'krw';
+
+// ── Comma format utils ─────────────────────────────────────────
+function fmtComma(v) {
+  const d = String(v).replace(/[^0-9]/g, '');
+  return d ? d.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
+}
+function stripComma(v) { return String(v).replace(/,/g, ''); }
+function bindComma(el) {
+  el.addEventListener('input', () => {
+    if (currency !== 'krw') return;
+    const start = el.selectionStart, before = el.value.length;
+    const formatted = fmtComma(el.value);
+    if (el.value !== formatted) {
+      el.value = formatted;
+      const p = Math.max(0, start + formatted.length - before);
+      el.setSelectionRange(p, p);
+    }
+  });
+}
+function reformatCommaInputs() {
+  const isKrw = currency === 'krw';
+  ['hold_price','hold_qty','current_price'].forEach(id => {
+    const el = document.getElementById(id); if (!el) return;
+    const raw = stripComma(el.value);
+    el.value = isKrw ? fmtComma(raw) : raw;
+  });
+  document.querySelectorAll('.buy-price,.buy-qty').forEach(el => {
+    const raw = stripComma(el.value);
+    el.value = isKrw ? fmtComma(raw) : raw;
+  });
+}
 
 // ── Exchange rate ──────────────────────────────────────────────
 let usdKrw = null;    // fetched rate
@@ -883,29 +914,30 @@ function switchTab(idx) {
 
 function saveCurrentInputsToTab(idx) {
   const tab = state.tabs[idx]; if(!tab) return;
-  tab.holdPrice = document.getElementById('hold_price').value;
-  tab.holdQty   = document.getElementById('hold_qty').value;
-  tab.curPrice  = document.getElementById('current_price').value;
+  tab.holdPrice = stripComma(document.getElementById('hold_price').value);
+  tab.holdQty   = stripComma(document.getElementById('hold_qty').value);
+  tab.curPrice  = stripComma(document.getElementById('current_price').value);
   tab.currency  = currency;
   const bp = document.querySelectorAll('.buy-price');
   const bq = document.querySelectorAll('.buy-qty');
   tab.buys = [];
-  for(let i=0;i<bp.length;i++) tab.buys.push({price:bp[i].value, qty:bq[i]?bq[i].value:''});
+  for(let i=0;i<bp.length;i++) tab.buys.push({price:stripComma(bp[i].value), qty:bq[i]?stripComma(bq[i].value):''});
 }
 
 function loadTab(idx) {
   const tab = state.tabs[idx]; if(!tab) return;
   if(tab.currency && tab.currency!==currency) { currency=tab.currency; applyUIForCurrency(); }
-  document.getElementById('hold_price').value    = tab.holdPrice||'';
-  document.getElementById('hold_qty').value      = tab.holdQty||'';
-  document.getElementById('current_price').value = tab.curPrice||'';
+  document.getElementById('hold_price').value    = currency==='krw' ? fmtComma(tab.holdPrice||'') : (tab.holdPrice||'');
+  document.getElementById('hold_qty').value      = currency==='krw' ? fmtComma(tab.holdQty||'') : (tab.holdQty||'');
+  document.getElementById('current_price').value = currency==='krw' ? fmtComma(tab.curPrice||'') : (tab.curPrice||'');
   const _sc = document.getElementById('sim-cur-price');
   if (_sc) _sc.value = tab.curPrice||'';
   document.querySelectorAll('.extra-row').forEach(r=>r.remove());
   const first = document.querySelector('#buy-rows .field-row[data-idx="0"]');
   const buys  = (tab.buys && tab.buys.length>0) ? tab.buys : [{price:'',qty:''}];
-  first.querySelector('.buy-price').value = buys[0].price||'';
-  first.querySelector('.buy-qty').value   = buys[0].qty||'';
+  const isKrw = currency==='krw';
+  first.querySelector('.buy-price').value = isKrw ? fmtComma(buys[0].price||'') : (buys[0].price||'');
+  first.querySelector('.buy-qty').value   = isKrw ? fmtComma(buys[0].qty||'') : (buys[0].qty||'');
   rowCount = 1;
   for(let i=1;i<buys.length;i++) addRowWith(buys[i].price, buys[i].qty);
   updateQuickPanel();
@@ -947,7 +979,7 @@ function deleteActiveTab() {
 
 // ── Currency ───────────────────────────────────────────────────
 function setCurrency(cur) {
-  currency=cur; applyUIForCurrency(); hideResult();
+  currency=cur; applyUIForCurrency(); reformatCommaInputs(); hideResult();
   state.tabs[state.active].currency=cur; state.lastCurrency=cur; saveData(state);
   updateFxBadge();
   if(cur==='usd') fetchExchangeRate();
@@ -976,9 +1008,9 @@ function applyUIForCurrency() {
 
 // ── Quick Panel ────────────────────────────────────────────────
 function updateQuickPanel() {
-  const hp  = parseFloat(document.getElementById('hold_price').value);
-  const hq  = parseFloat(document.getElementById('hold_qty').value);
-  const cp  = parseFloat(document.getElementById('current_price').value)||null;
+  const hp  = parseFloat(stripComma(document.getElementById('hold_price').value));
+  const hq  = parseFloat(stripComma(document.getElementById('hold_qty').value));
+  const cp  = parseFloat(stripComma(document.getElementById('current_price').value))||null;
   const panel = document.getElementById('quick-panel');
 
   const chartEl    = document.getElementById('chart-section');
@@ -1206,20 +1238,20 @@ document.getElementById('add-row-btn').addEventListener('click',()=>addRowWith('
 function addRowWith(pv,qv) {
   rowCount++;
   const c=CUR[currency];
+  const isKrw=currency==='krw';
+  const fv=isKrw?fmtComma(pv):pv, fq=isKrw?fmtComma(qv):qv;
   const wrap=document.createElement('div');
   wrap.className='extra-row';
   wrap.innerHTML=`
     <div class="field"><label>매수가 #${rowCount}</label>
-      <div class="input-wrap"><input type="number" class="buy-price" placeholder="${c.ph_buy}" inputmode="decimal" value="${pv}"><span class="unit price-unit">${c.unit}</span></div>
+      <div class="input-wrap"><input type="text" class="buy-price" placeholder="${c.ph_buy}" inputmode="decimal" value="${fv}"><span class="unit price-unit">${c.unit}</span></div>
     </div>
     <div class="field"><label>수량</label>
-      <div class="input-wrap"><input type="number" class="buy-qty" placeholder="50" inputmode="decimal" value="${qv}"><span class="unit">주</span></div>
+      <div class="input-wrap"><input type="text" class="buy-qty" placeholder="50" inputmode="numeric" value="${fq}"><span class="unit">주</span></div>
     </div>
     <button class="del-btn" onclick="this.parentElement.remove()">✕</button>`;
   document.getElementById('add-row-btn').parentElement.before(wrap);
-  wrap.querySelectorAll('.buy-price,.buy-qty').forEach(el=>{
-    el.addEventListener('wheel',()=>el.blur());
-  });
+  wrap.querySelectorAll('.buy-price,.buy-qty').forEach(el=>bindComma(el));
 }
 
 // ── Calculate (detailed) ───────────────────────────────────────
@@ -1230,14 +1262,14 @@ document.getElementById('calc-btn').addEventListener('click', calculate);
 
 function calculate() {
   const c=CUR[currency];
-  const hp=parseFloat(document.getElementById('hold_price').value);
-  const hq=parseFloat(document.getElementById('hold_qty').value);
-  const cp=parseFloat(document.getElementById('current_price').value)||null;
+  const hp=parseFloat(stripComma(document.getElementById('hold_price').value));
+  const hq=parseFloat(stripComma(document.getElementById('hold_qty').value));
+  const cp=parseFloat(stripComma(document.getElementById('current_price').value))||null;
   if(!hp||!hq||hp<=0||hq<=0){shake(document.getElementById('section-hold'));return;}
 
   let addedCost=0,addedQty=0;
   document.querySelectorAll('.buy-price').forEach((el,i)=>{
-    const p=parseFloat(el.value),q=parseFloat(document.querySelectorAll('.buy-qty')[i]?.value);
+    const p=parseFloat(stripComma(el.value)),q=parseFloat(stripComma(document.querySelectorAll('.buy-qty')[i]?.value||''));
     if(p>0&&q>0){addedCost+=p*q;addedQty+=q;}
   });
 
@@ -1318,12 +1350,12 @@ function showPromptModal(title, placeholder, cb){
   const inp=document.getElementById('modal-input');
   inp.style.display='block'; inp.value=''; inp.placeholder=placeholder;
   const bc=document.getElementById('modal-btns'); bc.innerHTML='';
-  const confirm=()=>{ closeModal(); cb(inp.value.trim()||placeholder); };
-  const cancel=()=>{ closeModal(); cb(null); };
-  [{label:'확인',cls:'primary',cb:confirm},{label:'취소',cls:'secondary',cb:cancel}].forEach(b=>{
+  let done=false;
+  function finish(name){ if(done)return; done=true; inp.removeEventListener('keydown',onKey); closeModal(); cb(name); }
+  function onKey(e){ if(e.key==='Enter')finish(inp.value.trim()||placeholder); else if(e.key==='Escape')finish(null); }
+  [{label:'확인',cls:'primary',cb:()=>finish(inp.value.trim()||placeholder)},{label:'취소',cls:'secondary',cb:()=>finish(null)}].forEach(b=>{
     const el=document.createElement('button');el.className='modal-btn '+b.cls;el.textContent=b.label;el.addEventListener('click',b.cb);bc.appendChild(el);
   });
-  function onKey(e){ if(e.key==='Enter'){inp.removeEventListener('keydown',onKey);confirm();}else if(e.key==='Escape'){inp.removeEventListener('keydown',onKey);cancel();} }
   inp.addEventListener('keydown',onKey);
   document.getElementById('modal').classList.add('show');
   setTimeout(()=>inp.focus(),80);
@@ -1766,9 +1798,8 @@ updateZoomLabel(); // 초기 라벨 동기화
 if(currency==='usd') fetchExchangeRate();
 setupChartInteraction();
 
-document.querySelectorAll('#hold_price,#hold_qty,#current_price,.buy-price,.buy-qty').forEach(el=>{
-  el.addEventListener('wheel',()=>el.blur());
-});
+['hold_price','hold_qty','current_price'].forEach(id=>bindComma(document.getElementById(id)));
+document.querySelectorAll('.buy-price,.buy-qty').forEach(el=>bindComma(el));
 
 // ── Tab bar drag-to-scroll (PC) ────────────────────────────────
 (()=>{
