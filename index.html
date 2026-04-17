@@ -1223,6 +1223,9 @@ function addRowWith(pv,qv) {
     </div>
     <button class="del-btn" onclick="this.parentElement.remove()">✕</button>`;
   document.getElementById('add-row-btn').parentElement.before(wrap);
+  wrap.querySelectorAll('.buy-price,.buy-qty').forEach(el=>{
+    el.addEventListener('wheel',e=>e.preventDefault(),{passive:false});
+  });
 }
 
 // ── Calculate (detailed) ───────────────────────────────────────
@@ -1759,8 +1762,8 @@ updateZoomLabel(); // 초기 라벨 동기화
 if(currency==='usd') fetchExchangeRate();
 setupChartInteraction();
 
-['hold_price','hold_qty','current_price'].forEach(id=>{
-  document.getElementById(id).addEventListener('wheel',e=>e.preventDefault(),{passive:false});
+document.querySelectorAll('#hold_price,#hold_qty,#current_price,.buy-price,.buy-qty').forEach(el=>{
+  el.addEventListener('wheel',e=>e.preventDefault(),{passive:false});
 });
 </script>
 </body>
