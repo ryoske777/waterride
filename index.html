@@ -419,7 +419,7 @@
       </div>
     </div>
     <div class="field">
-      <label>현재 주가 <span class="opt-tag">(선택 — 입력 시 현황 자동 계산)</span></label>
+      <label>현재 주가</label>
       <div class="input-wrap">
         <input type="number" id="current_price" placeholder="42000" inputmode="decimal">
         <span class="unit price-unit">원</span>
@@ -1224,7 +1224,7 @@ function addRowWith(pv,qv) {
     <button class="del-btn" onclick="this.parentElement.remove()">✕</button>`;
   document.getElementById('add-row-btn').parentElement.before(wrap);
   wrap.querySelectorAll('.buy-price,.buy-qty').forEach(el=>{
-    el.addEventListener('wheel',e=>e.preventDefault(),{passive:false});
+    el.addEventListener('wheel',()=>el.blur());
   });
 }
 
@@ -1637,13 +1637,6 @@ function setupChartInteraction() {
   if (btnIn)  btnIn.addEventListener('click',  () => { if (chartZoom < CHART_ZOOM_MAX) { chartZoom *= 2; updateZoomLabel(); redraw(); } });
   if (btnOut) btnOut.addEventListener('click', () => { if (chartZoom > 1) { chartZoom = Math.max(1, chartZoom / 2); updateZoomLabel(); redraw(); } });
 
-  // Mouse wheel zoom
-  canvas.addEventListener('wheel', e => {
-    e.preventDefault();
-    if (e.deltaY < 0) { if (chartZoom < CHART_ZOOM_MAX) chartZoom *= 2; }
-    else              { if (chartZoom > 1) chartZoom = Math.max(1, chartZoom / 2); }
-    updateZoomLabel(); redraw();
-  }, { passive: false });
 
   // Touch: single finger = cursor move, two finger = pinch zoom
   let lastPinchDist = null;
@@ -1763,7 +1756,7 @@ if(currency==='usd') fetchExchangeRate();
 setupChartInteraction();
 
 document.querySelectorAll('#hold_price,#hold_qty,#current_price,.buy-price,.buy-qty').forEach(el=>{
-  el.addEventListener('wheel',e=>e.preventDefault(),{passive:false});
+  el.addEventListener('wheel',()=>el.blur());
 });
 </script>
 </body>
