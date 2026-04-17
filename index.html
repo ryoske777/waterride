@@ -498,7 +498,7 @@
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
         <span style="font-size: 13px;color:var(--text2);font-family:'Space Mono',monospace;flex-shrink:0">현재가</span>
         <div class="input-wrap" style="flex:1">
-          <input type="number" id="sim-cur-price" inputmode="decimal"
+          <input type="text" id="sim-cur-price" inputmode="decimal"
             placeholder="0"
             style="border-radius:10px;padding:9px 36px 9px 12px;font-size: 15px">
           <span class="unit price-unit" style="font-size: 12px">원</span>
@@ -602,7 +602,7 @@
   <div class="target-input-row">
     <span class="target-input-label">목표 평단가</span>
     <div class="input-wrap" style="flex:1">
-      <input type="number" id="target-price" inputmode="decimal"
+      <input type="text" id="target-price" inputmode="decimal"
         placeholder="0"
         style="border-radius:10px;padding:9px 36px 9px 12px;font-size:15px">
       <span class="unit price-unit" style="font-size:12px">원</span>
@@ -792,7 +792,7 @@ function bindComma(el) {
 }
 function reformatCommaInputs() {
   const isKrw = currency === 'krw';
-  ['hold_price','hold_qty','current_price'].forEach(id => {
+  ['hold_price','hold_qty','current_price','sim-cur-price','target-price'].forEach(id => {
     const el = document.getElementById(id); if (!el) return;
     const raw = stripComma(el.value);
     el.value = isKrw ? fmtComma(raw) : raw;
@@ -931,7 +931,7 @@ function loadTab(idx) {
   document.getElementById('hold_qty').value      = currency==='krw' ? fmtComma(tab.holdQty||'') : (tab.holdQty||'');
   document.getElementById('current_price').value = currency==='krw' ? fmtComma(tab.curPrice||'') : (tab.curPrice||'');
   const _sc = document.getElementById('sim-cur-price');
-  if (_sc) _sc.value = tab.curPrice||'';
+  if (_sc) _sc.value = currency==='krw' ? fmtComma(tab.curPrice||'') : (tab.curPrice||'');
   document.querySelectorAll('.extra-row').forEach(r=>r.remove());
   const first = document.querySelector('#buy-rows .field-row[data-idx="0"]');
   const buys  = (tab.buys && tab.buys.length>0) ? tab.buys : [{price:'',qty:''}];
@@ -1168,36 +1168,36 @@ function updateSimulator(holdPrice, holdQty, curPrice) {
 }
 
 // Listen to HOLD inputs for live update
+let holdSaveTimer = null;
 ['hold_price','hold_qty','current_price'].forEach(id=>{
   document.getElementById(id).addEventListener('input', ()=>{
-    // current_price → sim-cur-price 동기화
     if (id === 'current_price') {
       const simCp = document.getElementById('sim-cur-price');
       if (simCp && simCp !== document.activeElement)
-        simCp.value = document.getElementById('current_price').value;
+        simCp.value = fmtComma(stripComma(document.getElementById('current_price').value));
     }
     updateQuickPanel();
-    saveCurrentInputsToTab(state.active);
-    saveData(state);
+    clearTimeout(holdSaveTimer);
+    holdSaveTimer = setTimeout(()=>{ saveCurrentInputsToTab(state.active); saveData(state); }, 400);
   });
 });
 
 // sim-cur-price → current_price 역방향 동기화
 document.getElementById('sim-cur-price')?.addEventListener('input', function() {
   const mainCp = document.getElementById('current_price');
-  mainCp.value = this.value;
+  mainCp.value = fmtComma(stripComma(this.value));
   updateQuickPanel();
-  saveCurrentInputsToTab(state.active);
-  saveData(state);
+  clearTimeout(holdSaveTimer);
+  holdSaveTimer = setTimeout(()=>{ saveCurrentInputsToTab(state.active); saveData(state); }, 400);
 });
 
 // ── Stepper ────────────────────────────────────────────────────
 const simQtyEl = document.getElementById('sim-qty');
 
 function refreshSim() {
-  const hp = parseFloat(document.getElementById('hold_price').value);
-  const hq = parseFloat(document.getElementById('hold_qty').value);
-  const cp = parseFloat(document.getElementById('current_price').value)||null;
+  const hp = parseFloat(stripComma(document.getElementById('hold_price').value));
+  const hq = parseFloat(stripComma(document.getElementById('hold_qty').value));
+  const cp = parseFloat(stripComma(document.getElementById('current_price').value))||null;
   if(hp&&hq&&cp) updateSimulator(hp,hq,cp);
 }
 
@@ -1721,10 +1721,10 @@ function setupChartInteraction() {
 document.getElementById('target-price')?.addEventListener('input', updateTargetGuide);
 
 function updateTargetGuide() {
-  const hp = parseFloat(document.getElementById('hold_price').value);
-  const hq = parseFloat(document.getElementById('hold_qty').value);
-  const cp = parseFloat(document.getElementById('current_price').value) || null;
-  const tp = parseFloat(document.getElementById('target-price').value) || null;
+  const hp = parseFloat(stripComma(document.getElementById('hold_price').value));
+  const hq = parseFloat(stripComma(document.getElementById('hold_qty').value));
+  const cp = parseFloat(stripComma(document.getElementById('current_price').value)) || null;
+  const tp = parseFloat(stripComma(document.getElementById('target-price').value)) || null;
 
   const impossibleEl = document.getElementById('target-impossible');
   const gridEl       = document.getElementById('target-grid');
@@ -1798,7 +1798,9 @@ updateZoomLabel(); // 초기 라벨 동기화
 if(currency==='usd') fetchExchangeRate();
 setupChartInteraction();
 
-['hold_price','hold_qty','current_price'].forEach(id=>bindComma(document.getElementById(id)));
+['hold_price','hold_qty','current_price','sim-cur-price','target-price'].forEach(id=>{
+  const el=document.getElementById(id); if(el) bindComma(el);
+});
 document.querySelectorAll('.buy-price,.buy-qty').forEach(el=>bindComma(el));
 
 // ── Tab bar drag-to-scroll (PC) ────────────────────────────────
