@@ -477,10 +477,6 @@
       </div>
     </div>
 
-    <!-- 회복 힌트 bar (손실 시) -->
-    <div id="sq-hint-bar" style="display:none;margin-top:10px;padding:9px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:11px;font-size: 12px;color:var(--text2);font-family:'Space Mono',monospace;line-height:1.7">
-      <span id="sq-hint-text"></span>
-    </div>
 
     <!-- 환율 badge (하단 — hidden, 상단으로 이동) -->
     <div style="display:none" id="fx-badge">
@@ -1004,7 +1000,7 @@ function updateQuickPanel() {
 
   // Status chip (수익 중 / 손실 중)
   const chip = document.getElementById('sq-status-chip');
-  chip.textContent = isProfit ? '▲ 수익 중' : '▼ 손실 중';
+  chip.textContent = isProfit ? '▲ ' + plRate.toFixed(2) + '% 수익 중' : '▼ ' + Math.abs(plRate).toFixed(2) + '% 손실 중';
   chip.style.background = isProfit ? 'rgba(255,77,109,0.12)' : 'rgba(96,165,250,0.12)';
   chip.style.color = isProfit ? 'var(--pos)' : 'var(--neg)';
 
@@ -1039,21 +1035,6 @@ function updateQuickPanel() {
     document.getElementById('sq-recover-val').textContent = '+'+plRate.toFixed(2)+'%';
     document.getElementById('sq-recover-sub').textContent = '';
     recoverWrap.style.display = 'block';
-  }
-
-  // Hint bar
-  const hintBar  = document.getElementById('sq-hint-bar');
-  const hintText = document.getElementById('sq-hint-text');
-  if (!isProfit) {
-    const totalLoss = Math.abs(pl);
-    const perShare  = Math.abs(hp - cp);
-    const recPct    = ((hp - cp) / cp * 100).toFixed(2);
-    hintBar.style.display = 'block';
-    hintText.innerHTML =
-      `현재가 <b style="color:var(--text)">${c.fmt(cp)}</b>에서 `+
-      `<b style="color:var(--accent3)">${recPct}%</b> 상승 시 원금 회복`;
-  } else {
-    hintBar.style.display = 'none';
   }
 
   // Metrics
