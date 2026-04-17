@@ -275,6 +275,69 @@
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
     input[type=number] { -moz-appearance: textfield; }
+
+    /* ── 희망 평단가 가이드 ── */
+    .target-section {
+      margin: 0 16px 14px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 18px; overflow: hidden; display: none;
+    }
+    .target-section.show { display: block; animation: fadeUp 0.3s ease; }
+    .badge-target { background: rgba(167,139,250,0.15); color: #a78bfa; }
+
+    .target-input-row {
+      padding: 14px 18px 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .target-input-label {
+      font-size: 13px; color: var(--text2); font-family: 'Space Mono', monospace;
+      flex-shrink: 0; white-space: nowrap;
+    }
+
+    .target-result {
+      margin: 0 14px 14px;
+      border-radius: 13px; overflow: hidden;
+    }
+
+    /* 불가 메시지 */
+    .target-impossible {
+      padding: 12px 16px;
+      background: rgba(255,77,109,0.07); border: 1px solid rgba(255,77,109,0.2);
+      border-radius: 13px; font-size: 13px; color: var(--accent2);
+      font-family: 'Space Mono', monospace; display: none;
+    }
+    .target-impossible.show { display: block; }
+
+    /* 결과 그리드 */
+    .target-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; display: none;
+    }
+    .target-grid.show { display: grid; }
+    .target-card {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 13px; padding: 12px 14px; min-width: 0; overflow: hidden;
+    }
+    .target-card.featured {
+      grid-column: 1 / -1;
+      border-color: rgba(167,139,250,0.35);
+      background: linear-gradient(135deg, rgba(167,139,250,0.06) 0%, var(--bg3) 100%);
+    }
+    .target-card-label {
+      font-size: clamp(10px, 2.8vw, 12px); color: var(--text2);
+      font-family: 'Space Mono', monospace; margin-bottom: 6px;
+    }
+    .target-card-val {
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(13px, 3.8vw, 16px); font-weight: 700; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .target-card-val.purple { color: #a78bfa; }
+    .target-card-val.yellow { color: var(--accent3); }
+    .target-card-sub {
+      margin-top: 4px; font-size: clamp(10px, 2.6vw, 12px);
+      color: var(--text3); font-family: 'Space Mono', monospace;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
     /* ── 소형 화면 대응 (iPhone mini 등 375px 이하) ── */
     @media (max-width: 390px) {
       .header-text h1       { font-size: 19px; }
@@ -528,6 +591,60 @@
   </div>
   <div class="chart-body">
     <canvas id="avg-chart" height="180"></canvas>
+  </div>
+</div>
+
+<!-- 희망 평단가 가이드 -->
+<div class="target-section" id="target-section">
+  <div class="section-header">
+    <span class="section-badge badge-target">GOAL</span>
+    <span class="section-title">희망 평단가 가이드</span>
+  </div>
+  <div class="target-input-row">
+    <span class="target-input-label">목표 평단가</span>
+    <div class="input-wrap" style="flex:1">
+      <input type="number" id="target-price" inputmode="decimal"
+        placeholder="0"
+        style="border-radius:10px;padding:9px 36px 9px 12px;font-size:15px">
+      <span class="unit price-unit" style="font-size:12px">원</span>
+    </div>
+  </div>
+  <div class="target-result" id="target-result">
+    <!-- 불가 메시지 -->
+    <div class="target-impossible" id="target-impossible"></div>
+    <!-- 결과 카드 -->
+    <div class="target-grid" id="target-grid">
+      <!-- 필요 수량 + 투자금 (전체 폭) -->
+      <div class="target-card featured">
+        <div class="target-card-label">필요 추가 수량</div>
+        <div class="target-card-val purple" id="tg-qty">—</div>
+        <div class="target-card-sub" id="tg-qty-sub"></div>
+      </div>
+      <!-- 추가 투자금 -->
+      <div class="target-card">
+        <div class="target-card-label">추가 투자금</div>
+        <div class="target-card-val yellow" id="tg-cost">—</div>
+        <div class="target-card-sub" id="tg-cost-krw"></div>
+      </div>
+      <!-- 총 투자금 -->
+      <div class="target-card">
+        <div class="target-card-label">총 투자금</div>
+        <div class="target-card-val" id="tg-total-cost">—</div>
+        <div class="target-card-sub" id="tg-total-cost-krw"></div>
+      </div>
+      <!-- 달성 후 평단가 확인 -->
+      <div class="target-card">
+        <div class="target-card-label">달성 후 평단가</div>
+        <div class="target-card-val purple" id="tg-achieved-avg">—</div>
+        <div class="target-card-sub" id="tg-achieved-avg-krw"></div>
+      </div>
+      <!-- 총 보유 수량 -->
+      <div class="target-card">
+        <div class="target-card-label">총 보유 수량</div>
+        <div class="target-card-val" id="tg-total-qty">—</div>
+        <div class="target-card-sub" id="tg-total-qty-sub"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -841,6 +958,11 @@ function applyUIForCurrency() {
   const _scp = document.getElementById('sim-cur-price');
   if (_scp) _scp.placeholder = c.ph_cur;
   document.querySelectorAll('.buy-price').forEach(el=>el.placeholder=c.ph_buy);
+  const _tp = document.getElementById('target-price');
+  if (_tp) { _tp.placeholder = c.ph_price; _tp.value = ''; }
+  // 통화 변경 시 가이드 초기화
+  document.getElementById('target-impossible')?.classList.remove('show');
+  document.getElementById('target-grid')?.classList.remove('show');
 }
 
 // ── Quick Panel ────────────────────────────────────────────────
@@ -850,20 +972,23 @@ function updateQuickPanel() {
   const cp  = parseFloat(document.getElementById('current_price').value)||null;
   const panel = document.getElementById('quick-panel');
 
-  const chartEl  = document.getElementById('chart-section');
-  const buyEl    = document.getElementById('buy-section');
-  const calcWrap = document.getElementById('calc-wrap-el');
+  const chartEl    = document.getElementById('chart-section');
+  const buyEl      = document.getElementById('buy-section');
+  const calcWrap   = document.getElementById('calc-wrap-el');
+  const targetSecEl= document.getElementById('target-section');
   if(!hp||!hq||hp<=0||hq<=0||!cp) {
     panel.classList.remove('show');
-    if(chartEl)  chartEl.style.display='none';
-    if(buyEl)    buyEl.style.display='none';
-    if(calcWrap) calcWrap.style.display='none';
+    if(chartEl)     chartEl.style.display='none';
+    if(buyEl)       buyEl.style.display='none';
+    if(calcWrap)    calcWrap.style.display='none';
+    if(targetSecEl) targetSecEl.classList.remove('show');
     return;
   }
   panel.classList.add('show');
-  if(chartEl)  chartEl.style.display='block';
-  if(buyEl)    buyEl.style.display='block';
-  if(calcWrap) calcWrap.style.display='block';
+  if(chartEl)     chartEl.style.display='block';
+  if(buyEl)       buyEl.style.display='block';
+  if(calcWrap)    calcWrap.style.display='block';
+  if(targetSecEl) targetSecEl.classList.add('show');
 
   const c = CUR[currency];
   const cost   = hp*hq;
@@ -1330,7 +1455,7 @@ function drawChart(holdPrice, holdQty, curPrice) {
   }) || niceSteps.find(s => Math.floor(maxAddShares/s) <= 5) || dotStep;
 
   // X grid ticks (점 위치마다 얇은 세로선)
-  if (maxAddShares > 0 && maxAddShares <= 200) {
+  if (maxAddShares > 0) {
     ctx.strokeStyle='rgba(42,42,56,0.7)'; ctx.lineWidth=1;
     for (let n = dotStep; n <= maxAddShares; n += dotStep) {
       const gx = px(n * curPrice);
@@ -1368,7 +1493,7 @@ function drawChart(holdPrice, holdQty, curPrice) {
   ctx.stroke();
 
   // 곡선 위 주 단위 점
-  if (maxAddShares > 0 && maxAddShares <= 200) {
+  if (maxAddShares > 0) {
     for (let n = dotStep; n <= maxAddShares; n += dotStep) {
       const dX   = n * curPrice;
       const dQty = holdQty + n;
@@ -1551,6 +1676,81 @@ function setupChartInteraction() {
 
   canvas.addEventListener('mousemove', e => moveCursor(e.clientX));
 }
+
+
+// ── 희망 평단가 가이드 ────────────────────────────────────────
+document.getElementById('target-price')?.addEventListener('input', updateTargetGuide);
+
+function updateTargetGuide() {
+  const hp = parseFloat(document.getElementById('hold_price').value);
+  const hq = parseFloat(document.getElementById('hold_qty').value);
+  const cp = parseFloat(document.getElementById('current_price').value) || null;
+  const tp = parseFloat(document.getElementById('target-price').value) || null;
+
+  const impossibleEl = document.getElementById('target-impossible');
+  const gridEl       = document.getElementById('target-grid');
+
+  if (!hp || !hq || !cp || !tp) {
+    impossibleEl.classList.remove('show');
+    gridEl.classList.remove('show');
+    return;
+  }
+
+  const c = CUR[currency];
+
+  // 유효성 검사
+  if (tp >= hp) {
+    impossibleEl.textContent = '⚠️ 목표 평단가는 현재 평단가(' + c.fmt(hp) + ')보다 낮아야 합니다.';
+    impossibleEl.classList.add('show');
+    gridEl.classList.remove('show');
+    return;
+  }
+  if (tp <= cp) {
+    impossibleEl.textContent = '⚠️ 목표 평단가는 현재가(' + c.fmt(cp) + ')보다 높아야 합니다. 현재가로 아무리 사도 그 이하로 내려갈 수 없어요.';
+    impossibleEl.classList.add('show');
+    gridEl.classList.remove('show');
+    return;
+  }
+
+  // n = holdQty * (holdPrice - targetAvg) / (targetAvg - curPrice)
+  const nExact   = hq * (hp - tp) / (tp - cp);
+  const nNeeded  = Math.ceil(nExact);          // 올림 (정수 주)
+  const addCost  = nNeeded * cp;
+  const newQty   = hq + nNeeded;
+  const totalCost= hp * hq + addCost;
+  const achievedAvg = totalCost / newQty;
+
+  impossibleEl.classList.remove('show');
+  gridEl.classList.add('show');
+
+  // 필요 추가 수량
+  document.getElementById('tg-qty').textContent = nNeeded.toLocaleString('ko-KR') + '주';
+  document.getElementById('tg-qty-sub').textContent =
+    '현재가 ' + c.fmt(cp) + ' 기준 · ' + c.fmt(addCost) + ' 필요';
+
+  // 추가 투자금
+  document.getElementById('tg-cost').textContent = c.fmt(addCost);
+  const krwCost = toKrwTag(addCost);
+  document.getElementById('tg-cost-krw').textContent = krwCost || '';
+
+  // 총 투자금
+  document.getElementById('tg-total-cost').textContent = c.fmt(totalCost);
+  const krwTotal = toKrwTag(totalCost);
+  document.getElementById('tg-total-cost-krw').textContent = krwTotal || '';
+
+  // 달성 후 실제 평단가 (올림으로 인해 목표보다 약간 낮을 수 있음)
+  document.getElementById('tg-achieved-avg').textContent = c.fmt(achievedAvg);
+  const krwAvg = toKrwTag(achievedAvg);
+  document.getElementById('tg-achieved-avg-krw').textContent =
+    krwAvg ? krwAvg + ' (목표: ' + c.fmt(tp) + ')' : '목표: ' + c.fmt(tp);
+
+  // 총 보유 수량
+  document.getElementById('tg-total-qty').textContent = newQty.toLocaleString('ko-KR') + '주';
+  document.getElementById('tg-total-qty-sub').textContent =
+    '현재 ' + hq.toLocaleString('ko-KR') + '주 + ' + nNeeded.toLocaleString('ko-KR') + '주';
+}
+
+// target-price placeholder도 통화 변경 시 업데이트
 
 // ── Init ───────────────────────────────────────────────────────
 initState();
