@@ -1758,6 +1758,10 @@ updateZoomLabel(); // 초기 라벨 동기화
 // Fetch rate if last currency was USD
 if(currency==='usd') fetchExchangeRate();
 setupChartInteraction();
+
+['hold_price','hold_qty','current_price'].forEach(id=>{
+  document.getElementById(id).addEventListener('wheel',e=>e.preventDefault(),{passive:false});
+});
 </script>
 </body>
 </html>
